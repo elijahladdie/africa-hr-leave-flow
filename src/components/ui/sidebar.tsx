@@ -205,31 +205,30 @@ export function SidebarMenuButton({
   ...props
 }: SidebarMenuButtonProps) {
   const { isCollapsed } = useSidebar()
-  const Comp = asChild ? React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-    (asdProps, ref) => React.cloneElement(React.Children.only(asdProps.children as React.ReactElement), {
-      ref,
-      className: cn(sidebarButtonVariants({ variant }), className),
-    })
-  ) : "button"
+  
+  // FIX: Modify the asChild implementation to correctly handle children
+  if (asChild) {
+    // Make sure we only handle a single child for asChild mode
+    const child = React.Children.only(props.children as React.ReactElement);
+    return React.cloneElement(child, {
+      className: cn(sidebarButtonVariants({ variant }), className, child.props.className),
+    });
+  }
 
   return (
-    <Comp
-      className={asChild ? undefined : cn(sidebarButtonVariants({ variant }), className)}
+    <button
+      className={cn(sidebarButtonVariants({ variant }), className)}
       {...props}
     >
-      {asChild ? null : (
-        <>
-          {props.children && React.Children.map(props.children, (child, index) => {
-            if (index === 0) {
-              return <span className="mr-2 flex h-5 w-5 items-center justify-center">
-                {child}
-              </span>
-            }
-            return isCollapsed ? null : child
-          })}
-        </>
-      )}
-    </Comp>
+      {props.children && React.Children.map(props.children, (child, index) => {
+        if (index === 0) {
+          return <span className="mr-2 flex h-5 w-5 items-center justify-center">
+            {child}
+          </span>
+        }
+        return isCollapsed ? null : child
+      })}
+    </button>
   )
 }
 

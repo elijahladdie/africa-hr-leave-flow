@@ -120,8 +120,8 @@ export function AppSidebar() {
                     className={activePage === item.url ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" : ""}
                     onClick={() => setActivePage(item.url)}
                   >
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
+                    <Link to={item.url} className="flex items-center">
+                      <item.icon className="h-4 w-4 mr-2" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
