@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,23 +21,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full">
-          <AppSidebar />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/apply" element={<LeaveApplication />} />
-              <Route path="/my-requests" element={<LeaveHistory />} />
-              <Route path="/approvals" element={<ApprovalDashboard />} />
-              <Route path="/team-calendar" element={<TeamCalendarPage />} />
-              <Route path="/settings" element={<AdminSettings />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </SidebarProvider>
+      <BrowserRouter>
+        <SidebarProvider>
+          <div className="min-h-screen flex w-full">
+            <AppSidebar />
+            <div className="flex-1 ml-[240px] transition-all duration-300">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/apply" element={<LeaveApplication />} />
+                <Route path="/my-requests" element={<LeaveHistory />} />
+                <Route path="/approvals" element={<ApprovalDashboard />} />
+                <Route path="/team-calendar" element={<TeamCalendarPage />} />
+                <Route path="/settings" element={<AdminSettings />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </div>
+        </SidebarProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
