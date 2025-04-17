@@ -90,7 +90,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex-1 ml-[240px] p-8 bg-background">
+    <div className="flex-1  p-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-africa-terracotta">Dashboard</h1>
         

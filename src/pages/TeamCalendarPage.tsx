@@ -6,7 +6,7 @@ import { TeamCalendar } from "@/components/calendar/team-calendar";
 
 export default function TeamCalendarPage() {
   return (
-    <div className="flex-1 ml-[240px] p-8 bg-background">
+    <div className="flex-1  p-8 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild className="mb-4">
