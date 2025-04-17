@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminSettings() {
   return (
-    <div className="flex-1 ml-[240px] p-8 bg-background">
+    <div className="flex-1 p-8 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild className="mb-4">

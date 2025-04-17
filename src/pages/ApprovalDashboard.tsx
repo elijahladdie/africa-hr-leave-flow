@@ -76,7 +76,7 @@ export default function ApprovalDashboard() {
   ];
 
   return (
-    <div className="flex-1 ml-[240px] p-8 bg-background">
+    <div className="flex-1  p-8 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
