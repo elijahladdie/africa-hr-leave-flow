@@ -90,11 +90,11 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex-1  p-8 bg-background">
+    <div className="flex-1 p-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-africa-terracotta">Dashboard</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column */}
           <div className="col-span-1">
             <UserProfile 
@@ -112,14 +112,16 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* Middle and right columns */}
-          <div className="col-span-1 md:col-span-2">
+          {/* Middle and right columns - now with responsive grid */}
+          <div className="col-span-1 lg:col-span-2">
+            {/* Leave balance cards in a responsive 2-column grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               {leaveBalances.map((balance, index) => (
                 <LeaveBalanceCard key={index} {...balance} />
               ))}
             </div>
             
+            {/* Team calendar and upcoming leaves in a responsive grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <UpcomingLeaves leaves={teamLeaves} />
               <TeamCalendar />
