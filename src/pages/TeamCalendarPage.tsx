@@ -6,7 +6,7 @@ import { TeamCalendar } from "@/components/calendar/team-calendar";
 
 export default function TeamCalendarPage() {
   return (
-    <div className="flex-1  p-8 bg-background">
+    <div className="flex-1 p-4 md:p-6 lg:p-8 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild className="mb-4">
@@ -15,7 +15,7 @@ export default function TeamCalendarPage() {
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-africa-terracotta">Team Calendar</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-africa-terracotta">Team Calendar</h1>
           <p className="text-muted-foreground mt-1">View your team's leave schedule and public holidays.</p>
         </div>
         

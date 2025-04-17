@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { 
   Calendar, 
@@ -16,13 +16,14 @@ import {
   Home, 
   Users, 
   Clock, 
-  Bell, 
   Settings,
   BarChart4,
-  UserCog
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type MenuItem = {
   title: string;
@@ -80,7 +81,9 @@ const menuItems: MenuItem[] = [
 export function AppSidebar() {
   // In a real app, this would come from auth context or API
   const [userRole, setUserRole] = useState<'staff' | 'manager' | 'admin'>('staff');
-  const [activePage, setActivePage] = useState('/');
+  const location = useLocation();
+  const { isCollapsed, setIsCollapsed } = useSidebar();
+  const isMobile = useIsMobile();
   
   // Filter menu items based on user role
   const filteredMenuItems = menuItems.filter(item => 
@@ -94,6 +97,13 @@ export function AppSidebar() {
     else setUserRole('staff');
   };
 
+  // If on mobile, keep sidebar collapsed by default
+  useState(() => {
+    if (isMobile && !isCollapsed) {
+      setIsCollapsed(true);
+    }
+  });
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -101,11 +111,19 @@ export function AppSidebar() {
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <span className="font-semibold text-lg text-white">AHR</span>
           </div>
-          <div className="flex flex-col">
-            <span className="font-medium text-sm">Africa HR</span>
-            <span className="text-xs text-muted-foreground">Leave Management</span>
-          </div>
+          {!isCollapsed && (
+            <div className="flex flex-col">
+              <span className="font-medium text-sm">Africa HR</span>
+              <span className="text-xs text-muted-foreground">Leave Management</span>
+            </div>
+          )}
         </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute right-0 top-5 -mr-4 flex h-7 w-7 items-center justify-center rounded-full border bg-background text-foreground shadow-sm hover:bg-muted lg:block hidden"
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -117,8 +135,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     variant="default"
                     asChild
-                    className={activePage === item.url ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" : ""}
-                    onClick={() => setActivePage(item.url)}
+                    className={location.pathname === item.url ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" : ""}
                   >
                     <Link to={item.url} className="flex items-center">
                       <item.icon className="h-4 w-4 mr-2" />
@@ -132,18 +149,20 @@ export function AppSidebar() {
         </SidebarGroup>
         
         {/* User role controls (just for demo) */}
-        <div className="mt-4 px-3 text-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Current Role:</span>
-            <span className="font-medium capitalize">{userRole}</span>
+        {!isCollapsed && (
+          <div className="mt-4 px-3 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Current Role:</span>
+              <span className="font-medium capitalize">{userRole}</span>
+            </div>
+            <button 
+              onClick={changeRole} 
+              className="mt-1 text-xs bg-sidebar-accent w-full rounded-md py-1 hover:bg-sidebar-accent/80 transition-colors"
+            >
+              Switch Role (Demo)
+            </button>
           </div>
-          <button 
-            onClick={changeRole} 
-            className="mt-1 text-xs bg-sidebar-accent w-full rounded-md py-1 hover:bg-sidebar-accent/80 transition-colors"
-          >
-            Switch Role (Demo)
-          </button>
-        </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );

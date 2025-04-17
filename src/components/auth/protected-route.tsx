@@ -20,8 +20,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1  transition-all duration-300">
-          {children}
+        <div className="flex-1 overflow-x-hidden transition-all duration-300">
+          <div className="max-w-[1600px] mx-auto w-full">
+            {children}
+          </div>
         </div>
       </div>
     </SidebarProvider>
