@@ -12,6 +12,8 @@ import LeaveHistory from "./pages/LeaveHistory";
 import ApprovalDashboard from "./pages/ApprovalDashboard";
 import TeamCalendarPage from "./pages/TeamCalendarPage";
 import AdminSettings from "./pages/AdminSettings";
+import Team from "./pages/Team"; 
+import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { AuthProvider } from "@/contexts/auth-context";
@@ -72,6 +74,24 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <TeamCalendarPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/team" 
+                  element={
+                    <ProtectedRoute>
+                      <Team />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/reports" 
+                  element={
+                    <ProtectedRoute>
+                      <Reports />
                     </ProtectedRoute>
                   } 
                 />
