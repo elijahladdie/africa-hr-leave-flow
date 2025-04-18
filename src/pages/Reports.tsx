@@ -5,7 +5,7 @@ import {
   BarChart, 
   PieChart, 
   ChevronLeft, 
-  FileChart, 
+  FileText, 
   Download
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -157,7 +157,7 @@ export default function Reports() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-medium flex items-center">
-              <FileChart className="h-5 w-5 mr-2 text-africa-terracotta" />
+              <FileText className="h-5 w-5 mr-2 text-africa-terracotta" />
               Available Reports
             </h2>
             <Button variant="outline">
