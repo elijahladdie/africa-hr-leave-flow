@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   
@@ -30,11 +30,9 @@ const Login = () => {
         const success = await login(email);
         
         if (success) {
-          // Redirect to dashboard after successful login
-          setTimeout(() => {
-            setIsLoading(false);
-            navigate('/');
-          }, 1000);
+          // After successful login, check if user needs to complete profile
+          // The navigation is now handled by the AuthController component in App.tsx
+          setIsLoading(false);
         } else {
           setIsLoading(false);
         }
