@@ -10,6 +10,17 @@ interface User {
   team?: string;
   role?: string;
   hasCompletedProfile?: boolean;
+  leaveBalance?: {
+    annual: { total: number, used: number, pending: number, expiring: number };
+    sick: { total: number, used: number };
+    study: { total: number, used: number };
+    family: { total: number, used: number };
+  };
+  notificationSettings?: {
+    email: boolean;
+    pushNotifications: boolean;
+    remindersBefore: number;
+  };
 }
 
 interface AuthContextType {
@@ -75,7 +86,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       name: email.split('@')[0],
       email: email,
       avatar: 'https://i.pravatar.cc/150?u=' + email,
-      hasCompletedProfile: false
+      hasCompletedProfile: false,
+      leaveBalance: {
+        annual: { total: 24, used: 12, pending: 2, expiring: 5 },
+        sick: { total: 14, used: 3 },
+        study: { total: 10, used: 2 },
+        family: { total: 5, used: 1 }
+      },
+      notificationSettings: {
+        email: true,
+        pushNotifications: false,
+        remindersBefore: 3
+      }
     };
     
     // Check if we have stored profile data for this user
@@ -96,7 +118,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     // Show success message
     toast.success("Login successful!", {
-      description: "Welcome to Africa HR Leave Management System",
+      description: "Welcome to IST Africa Leave Management System",
     });
     
     return true;

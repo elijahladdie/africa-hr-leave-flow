@@ -137,14 +137,14 @@ const Login = () => {
                 Forgot your password?
               </button>
               <p className="text-xs text-muted-foreground mt-4">
-                © {new Date().getFullYear()} Africa HR Ltd. All rights reserved.
+                © {new Date().getFullYear()} IST Africa Ltd. All rights reserved.
               </p>
             </div>
           </CardFooter>
         </Card>
         
         <div className="mt-8 text-center text-sm text-muted-foreground animate-fade-in">
-          <p>Need help? Contact IT Support at support@africahr.com</p>
+          <p>Need help? Contact IT Support at support@ist.com</p>
         </div>
       </div>
     </div>
