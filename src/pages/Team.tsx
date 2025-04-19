@@ -1,65 +1,64 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Sample team members data
+// Sample team members data with African names and roles
 const teamMembers = [
   {
     id: "1",
-    name: "John Doe",
-    role: "Software Engineer",
+    name: "Mohammed Ibrahim",
+    role: "Senior Software Engineer",
     department: "Engineering",
-    email: "john.doe@example.com",
+    email: "mohammed.ibrahim@ist.com",
     avatar: undefined,
-    joinDate: "Jan 15, 2022",
+    joinDate: "Jan 15, 2024",
   },
   {
     id: "2",
-    name: "Jane Smith",
-    role: "Product Manager",
-    department: "Product",
-    email: "jane.smith@example.com",
+    name: "Amina Said",
+    role: "HR Manager",
+    department: "Human Resources",
+    email: "amina.said@ist.com",
     avatar: undefined,
-    joinDate: "Mar 5, 2021",
+    joinDate: "Mar 5, 2023",
   },
   {
     id: "3",
-    name: "Michael Johnson",
-    role: "UX Designer",
-    department: "Design",
-    email: "michael.johnson@example.com",
+    name: "John Kamau",
+    role: "Product Manager",
+    department: "Product",
+    email: "john.kamau@ist.com",
     avatar: undefined,
-    joinDate: "Oct 12, 2022",
+    joinDate: "Oct 12, 2024",
   },
   {
     id: "4",
-    name: "Sarah Williams",
-    role: "Marketing Specialist",
-    department: "Marketing",
-    email: "sarah.williams@example.com",
+    name: "Fatima Ahmed",
+    role: "Finance Director",
+    department: "Finance",
+    email: "fatima.ahmed@ist.com",
     avatar: undefined,
     joinDate: "Feb 28, 2023",
   },
   {
     id: "5",
-    name: "David Brown",
+    name: "Daniel Osei",
     role: "DevOps Engineer",
     department: "Engineering",
-    email: "david.brown@example.com",
+    email: "daniel.osei@ist.com",
     avatar: undefined,
-    joinDate: "Jun 10, 2022",
+    joinDate: "Jun 10, 2024",
   },
   {
     id: "6",
-    name: "Emily Davis",
-    role: "HR Manager",
-    department: "HR",
-    email: "emily.davis@example.com",
+    name: "Grace Mutua",
+    role: "Marketing Lead",
+    department: "Marketing",
+    email: "grace.mutua@ist.com",
     avatar: undefined,
-    joinDate: "Apr 15, 2021",
+    joinDate: "Apr 15, 2023",
   },
 ];
 

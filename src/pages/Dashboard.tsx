@@ -7,85 +7,91 @@ import { UpcomingLeaves } from "@/components/dashboard/upcoming-leaves";
 import { UserProfile } from "@/components/dashboard/user-profile";
 
 export default function Dashboard() {
-  // Sample leave balance data
+  // Sample leave balance data with more realistic values
   const leaveBalances = [
     {
-      leaveType: "Personal Time Off (PTO)",
-      usedDays: 8,
-      totalDays: 21,
-      accrued: 1.66, // Days per month
-      expiring: 3,
+      leaveType: "Annual Leave",
+      usedDays: 12,
+      totalDays: 24,
+      accrued: 2,
+      expiring: 5,
     },
     {
       leaveType: "Sick Leave",
       usedDays: 3,
-      totalDays: 15,
+      totalDays: 14,
+      accrued: 1.16,
+      expiring: 0,
     },
     {
-      leaveType: "Maternity Leave",
-      usedDays: 0,
-      totalDays: 84,
+      leaveType: "Study Leave",
+      usedDays: 2,
+      totalDays: 10,
+      accrued: 0,
+      expiring: 0,
     },
     {
-      leaveType: "Compassionate Leave",
+      leaveType: "Family Responsibility",
       usedDays: 1,
       totalDays: 5,
+      accrued: 0,
+      expiring: 0,
     },
   ];
 
-  // Sample notifications
+  // Sample notifications with IST Africa specific content
   const notifications = [
     {
       id: "1",
       title: "Leave Request Approved",
-      message: "Your PTO request for April 20-22 has been approved.",
+      message: "Your annual leave request for the Eid celebration has been approved by John Manager.",
       timestamp: "2 hours ago",
       type: "success" as "success",
       read: false,
     },
     {
       id: "2",
-      title: "New Company Holiday",
-      message: "A new public holiday has been added: Liberation Day, July 4.",
+      title: "Team Leave Update",
+      message: "Sarah from Finance will be on study leave next week. Plan accordingly.",
       timestamp: "1 day ago",
       type: "info" as "info",
       read: true,
     },
     {
       id: "3",
-      title: "Document Required",
-      message: "Please upload supporting document for your sick leave request.",
+      title: "Policy Update",
+      message: "New leave policy for Ramadan period is now available. Please review.",
       timestamp: "2 days ago",
       type: "warning" as "warning",
       read: false,
     },
   ];
   
-  // Sample team leave data
+  // Sample team leave data with African holidays and events
   const teamLeaves = [
     {
       id: "1",
-      name: "Jane Smith",
+      name: "Amina Hassan",
       avatar: undefined,
-      startDate: "2023-04-15",
-      endDate: "2023-04-18",
-      leaveType: "PTO",
+      startDate: "2025-04-22",
+      endDate: "2025-04-25",
+      leaveType: "Annual Leave",
     },
     {
       id: "2",
-      name: "Michael Johnson",
+      name: "John Okafor",
       avatar: undefined,
-      startDate: "2023-04-20",
-      endDate: "2023-04-22",
-      leaveType: "Sick Leave",
+      startDate: "2025-04-29",
+      endDate: "2025-05-02",
+      leaveType: "Study Leave",
     },
     {
       id: "3",
-      name: "Sarah Williams",
+      name: "Fatima Mohammed",
       avatar: undefined,
-      startDate: "2023-04-25",
-      endDate: "2023-05-02",
-      leaveType: "PTO",
+      startDate: "2025-05-06",
+      endDate: "2025-05-13",
+      leaveType: "Annual Leave",
     },
   ];
 

@@ -55,10 +55,10 @@ const Login = () => {
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-africa-terracotta text-white mb-4">
-              <span className="font-bold text-xl">AHR</span>
+              <span className="font-bold text-xl">IST</span>
             </div>
           </div>
-          <h1 className="text-3xl font-semibold text-africa-dark">Africa HR</h1>
+          <h1 className="text-3xl font-semibold text-africa-dark">IST Africa</h1>
           <p className="text-muted-foreground mt-2">Leave Management System</p>
         </div>
         
