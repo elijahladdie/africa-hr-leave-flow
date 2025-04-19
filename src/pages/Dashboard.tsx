@@ -1,4 +1,3 @@
-
 import { LeaveBalanceCard } from "@/components/dashboard/leave-balance-card";
 import { NotificationsPanel } from "@/components/dashboard/notifications-panel";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -98,12 +97,14 @@ export default function Dashboard() {
   return (
     <div className="flex-1 p-8 bg-background">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-africa-terracotta">Dashboard</h1>
-        
+        <h1 className="text-3xl font-bold mb-6 text-africa-terracotta">
+          Dashboard
+        </h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column */}
           <div className="col-span-1">
-            <UserProfile 
+            <UserProfile
               name="John Doe"
               role="Software Engineer"
               department="Engineering"
@@ -117,7 +118,7 @@ export default function Dashboard() {
               <NotificationsPanel notifications={notifications} />
             </div>
           </div>
-          
+
           {/* Middle and right columns - now with responsive grid */}
           <div className="col-span-1 lg:col-span-2">
             {/* Leave balance cards in a responsive 2-column grid */}
@@ -126,7 +127,7 @@ export default function Dashboard() {
                 <LeaveBalanceCard key={index} {...balance} />
               ))}
             </div>
-            
+
             {/* Team calendar and upcoming leaves in a responsive grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <UpcomingLeaves leaves={teamLeaves} />

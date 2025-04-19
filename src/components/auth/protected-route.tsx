@@ -1,17 +1,12 @@
-
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Navigate, Outlet } from "react-router-dom";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { useAuth } from "@/contexts/auth-context";
 
-interface ProtectedRouteProps {
-  children: ReactNode;
-}
-
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+export const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
-  
+  const { isCollapsed } = useSidebar();
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -19,10 +14,12 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        <div className={`${isCollapsed ? "w-16" : "w-64"}  shrink-0`}>
+          <AppSidebar />
+        </div>
         <div className="flex-1 overflow-x-hidden transition-all duration-300">
-          <div className="max-w-[1600px] mx-auto w-full">
-            {children}
+          <div className="w-full max-w-screen-xl mx-auto px-4">
+            <Outlet />
           </div>
         </div>
       </div>

@@ -70,79 +70,48 @@ const App = () => {
               <AuthController>
                 <Routes>
                   <Route path="/login" element={<Login />} />
-                  <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-                  
-                  <Route 
-                    path="/" 
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    } 
+                  <Route path="/" element={<ProtectedRoute />}>
+                  <Route index element={<Index />} 
                   />
                   
+                  <Route path="/profile-setup" element={<ProfileSetup />} />
+                  
+                 
                   <Route 
                     path="/apply" 
-                    element={
-                      <ProtectedRoute>
-                        <LeaveApplication />
-                      </ProtectedRoute>
-                    } 
+                    element={<LeaveApplication />} 
                   />
                   
                   <Route 
                     path="/my-requests" 
-                    element={
-                      <ProtectedRoute>
-                        <LeaveHistory />
-                      </ProtectedRoute>
-                    } 
+                    element={<LeaveHistory />} 
                   />
                   
                   <Route 
                     path="/approvals" 
-                    element={
-                      <ProtectedRoute>
-                        <ApprovalDashboard />
-                      </ProtectedRoute>
-                    } 
+                    element={<ApprovalDashboard />} 
                   />
                   
                   <Route 
                     path="/team-calendar" 
-                    element={
-                      <ProtectedRoute>
-                        <TeamCalendarPage />
-                      </ProtectedRoute>
-                    } 
+                    element={<TeamCalendarPage />} 
                   />
                   
                   <Route 
                     path="/team" 
-                    element={
-                      <ProtectedRoute>
-                        <Team />
-                      </ProtectedRoute>
-                    } 
+                    element={<Team />} 
                   />
                   
                   <Route 
                     path="/reports" 
-                    element={
-                      <ProtectedRoute>
-                        <Reports />
-                      </ProtectedRoute>
-                    } 
+                    element={<Reports />} 
                   />
                   
                   <Route 
                     path="/settings" 
-                    element={
-                      <ProtectedRoute>
-                        <AdminSettings />
-                      </ProtectedRoute>
-                    } 
+                    element={<AdminSettings />} 
                   />
+                  </Route>
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>
