@@ -18,11 +18,9 @@ import {
   Clock,
   Settings,
   BarChart4,
-  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 type MenuItem = {
   title: string;
@@ -44,8 +42,6 @@ const menuItems: MenuItem[] = [
 export function AppSidebar() {
   const [userRole, setUserRole] = useState<"staff" | "manager" | "admin">("staff");
   const location = useLocation();
-  const { isCollapsed, setIsCollapsed } = useSidebar();
-  const isMobile = useIsMobile();
 
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(userRole));
 
@@ -54,25 +50,6 @@ export function AppSidebar() {
     else if (userRole === "manager") setUserRole("admin");
     else setUserRole("staff");
   };
-
-  useState(() => {
-    if (isMobile && !isCollapsed) {
-      setIsCollapsed(true);
-    }
-  });
-
-  if (isCollapsed) {
-    return (
-      <div className="fixed top-4 left-4 z-50">
-        <button
-          onClick={() => setIsCollapsed(false)}
-          className="rounded-full p-2 border bg-background text-foreground shadow hover:bg-muted"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    );
-  }
 
   return (
     <Sidebar className="transition-all duration-300">
@@ -86,13 +63,6 @@ export function AppSidebar() {
             <span className="text-xs text-muted-foreground">Leave Management</span>
           </div>
         </div>
-        <button
-          onClick={() => setIsCollapsed(true)}
-          className="absolute right-0 top-5 -mr-4 flex h-7 w-7 items-center justify-center rounded-full border bg-background text-foreground shadow-sm hover:bg-muted lg:block hidden"
-        >
-          {/* Collapse button */}
-          <ChevronRight className="h-4 w-4" />
-        </button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
