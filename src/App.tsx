@@ -29,6 +29,14 @@ const AuthController = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log("AuthController running", { isAuthenticated, user, path: location.pathname });
+    
+    // If user is not authenticated and not on login page, redirect to login
+    if (!isAuthenticated && location.pathname !== '/login') {
+      navigate('/login');
+      return;
+    }
+    
     // If the user is authenticated but hasn't completed profile setup
     // and isn't already on the profile setup page
     if (isAuthenticated && 
@@ -37,6 +45,13 @@ const AuthController = ({ children }: { children: React.ReactNode }) => {
         location.pathname !== '/profile-setup' &&
         location.pathname !== '/login') {
       navigate('/profile-setup');
+      return;
+    }
+    
+    // If authenticated and on login page, redirect to home
+    if (isAuthenticated && location.pathname === '/login') {
+      navigate('/');
+      return;
     }
   }, [isAuthenticated, user, navigate, location.pathname]);
 

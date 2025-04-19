@@ -31,7 +31,11 @@ const Login = () => {
         
         if (success) {
           // After successful login, check if user needs to complete profile
-          // The navigation is now handled by the AuthController component in App.tsx
+          if (user && !user.hasCompletedProfile) {
+            navigate('/profile-setup');
+          } else {
+            navigate('/');
+          }
           setIsLoading(false);
         } else {
           setIsLoading(false);
