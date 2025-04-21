@@ -28,12 +28,11 @@ export const ProtectedRoute = () => {
   console.log(user, "user in protected route");
   // Check if the user is authenticated
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   
-  // Check if the user has permission to access this route
-  // Skip this check for profile setup which is accessible to all authenticated users
+
   if (user?.role && location.pathname !== "/profile-setup") {
     const currentRoute = roleBasedRoutes.find(
       (route) =>
