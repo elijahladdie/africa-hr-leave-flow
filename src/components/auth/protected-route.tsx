@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
@@ -11,35 +10,37 @@ const roleBasedRoutes: {
   path: string;
   allowedRoles: string[];
 }[] = [
-  { path: "/", allowedRoles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/my-requests", allowedRoles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/team-calendar", allowedRoles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/apply", allowedRoles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/profile-setup", allowedRoles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/approvals", allowedRoles: ["Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/team", allowedRoles: ["Manager", "Admin", "Department Head", "Executive"] },
-  { path: "/reports", allowedRoles: ["Admin", "Department Head", "Executive"] },
-  { path: "/settings", allowedRoles: ["Admin"] }
+  { path: "/", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/my-requests", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/team-calendar", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/apply", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/profile-setup", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/approvals", allowedRoles: ["MANAGER", "ADMIN"] },
+  { path: "/team", allowedRoles: ["MANAGER", "ADMIN"] },
+  { path: "/reports", allowedRoles: ["ADMIN"] },
+  { path: "/settings", allowedRoles: ["ADMIN"] },
 ];
 
 export const ProtectedRoute = () => {
   const { isAuthenticated, user } = useAuth();
   const { isCollapsed } = useSidebar();
   const location = useLocation();
-  
+  console.log(user, "user in protected route");
   // Check if the user is authenticated
+
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
   
   // Check if the user has permission to access this route
   // Skip this check for profile setup which is accessible to all authenticated users
-  if (user?.role && location.pathname !== '/profile-setup') {
-    const currentRoute = roleBasedRoutes.find(route => 
-      location.pathname === route.path || 
-      (route.path !== '/' && location.pathname.startsWith(route.path))
+  if (user?.role && location.pathname !== "/profile-setup") {
+    const currentRoute = roleBasedRoutes.find(
+      (route) =>
+        location.pathname === route.path ||
+        (route.path !== "/" && location.pathname.startsWith(route.path))
     );
-    
+
     if (currentRoute && !currentRoute.allowedRoles.includes(user.role)) {
       toast.error("Access denied", {
         description: "You don't have permission to access this page",

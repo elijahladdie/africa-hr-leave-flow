@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -39,13 +38,38 @@ type MenuItem = {
 };
 
 const menuItems: MenuItem[] = [
-  { title: "Dashboard", url: "/", icon: Home, roles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { title: "My Requests", url: "/my-requests", icon: FileText, roles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { title: "Team Calendar", url: "/team-calendar", icon: Calendar, roles: ["Staff", "Manager", "Admin", "Department Head", "Executive"] },
-  { title: "Approvals", url: "/approvals", icon: Clock, roles: ["Manager", "Admin", "Department Head", "Executive"] },
-  { title: "Team Management", url: "/team", icon: Users, roles: ["Manager", "Admin", "Department Head", "Executive"] },
-  { title: "Reports", url: "/reports", icon: BarChart4, roles: ["Admin", "Department Head", "Executive"] },
-  { title: "Settings", url: "/settings", icon: Settings, roles: ["Admin"] },
+  {
+    title: "Dashboard",
+    url: "/",
+    icon: Home,
+    roles: ["STAFF", "MANAGER", "ADMIN"],
+  },
+  {
+    title: "My Requests",
+    url: "/my-requests",
+    icon: FileText,
+    roles: ["STAFF", "MANAGER", "ADMIN"],
+  },
+  {
+    title: "Team Calendar",
+    url: "/team-calendar",
+    icon: Calendar,
+    roles: ["STAFF", "MANAGER", "ADMIN"],
+  },
+  {
+    title: "Approvals",
+    url: "/approvals",
+    icon: Clock,
+    roles: ["MANAGER", "ADMIN"],
+  },
+  {
+    title: "Team Management",
+    url: "/team",
+    icon: Users,
+    roles: ["MANAGER", "ADMIN"],
+  },
+  { title: "Reports", url: "/reports", icon: BarChart4, roles: ["ADMIN"] },
+  { title: "Settings", url: "/settings", icon: Settings, roles: ["ADMIN"] },
 ];
 
 export function AppSidebar() {
@@ -54,7 +78,7 @@ export function AppSidebar() {
   const { isCollapsed, setIsCollapsed } = useSidebar();
   const isMobile = useIsMobile();
 
-  const filteredMenuItems = menuItems.filter((item) => 
+  const filteredMenuItems = menuItems.filter((item) =>
     user?.role ? item.roles.includes(user.role) : false
   );
 
@@ -96,7 +120,9 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="font-medium text-sm">IST Africa</span>
-            <span className="text-xs text-muted-foreground">Leave Management</span>
+            <span className="text-xs text-muted-foreground">
+              Leave Management
+            </span>
           </div>
         </div>
         <button
@@ -118,10 +144,12 @@ export function AppSidebar() {
           </Avatar>
           <div className="truncate">
             <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email}
+            </p>
           </div>
         </div>
-        
+
         {/* Notification Button */}
         <div className="mb-4 px-3">
           <Button variant="outline" className="w-full justify-start" size="sm">
@@ -132,7 +160,7 @@ export function AppSidebar() {
             </span>
           </Button>
         </div>
-        
+
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -174,8 +202,8 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    variant="ghost" 
+                  <SidebarMenuButton
+                    variant="ghost"
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     onClick={logout}
                   >
@@ -186,7 +214,7 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          
+
           <div className="mt-6 text-xs text-muted-foreground text-center">
             <p>IST Africa Leave System</p>
             <p>v1.0.0</p>

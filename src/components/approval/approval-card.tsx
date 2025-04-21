@@ -1,4 +1,3 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,29 +16,22 @@ import {
 } from "@/components/ui/tooltip";
 import { CheckCircle, Clock, File, HelpCircle, XCircle } from "lucide-react";
 import { useState } from "react";
+import { LeaveApproval } from '@/types/approval';
 
 interface ApprovalCardProps {
-  request: {
-    id: string;
-    employeeName: string;
-    avatar?: string;
-    leaveType: string;
-    startDate: string;
-    endDate: string;
-    duration: string;
-    reason?: string;
-    documentUrl?: string;
-    submittedDate: string;
-  };
+  request: LeaveApproval;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
 }
 
-export function ApprovalCard({ request }: ApprovalCardProps) {
+export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps) {
   const [comment, setComment] = useState("");
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
 
   // Get initials for avatar
   const getInitials = (name: string) => {
+    if(!name) return "N/A";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -79,19 +71,19 @@ export function ApprovalCard({ request }: ApprovalCardProps) {
             <Avatar>
               <AvatarImage src={request.avatar} />
               <AvatarFallback className="bg-africa-blue/10 text-africa-blue">
-                {getInitials(request.employeeName)}
+                {getInitials(request.userName)}
               </AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-base font-medium">
-                {request.employeeName}
+                {request.userName}
               </CardTitle>
               <p className="text-sm text-muted-foreground">{request.leaveType}</p>
             </div>
           </div>
           <div className="flex items-center text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5 mr-1" />
-            <span>Submitted: {new Date(request.submittedDate).toLocaleDateString()}</span>
+            <span>Submitted: {new Date(request.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
       </CardHeader>
@@ -115,7 +107,7 @@ export function ApprovalCard({ request }: ApprovalCardProps) {
             </div>
           )}
           
-          {request.documentUrl && (
+          {request?.documentUrl && (
             <div>
               <Button
                 variant="outline"

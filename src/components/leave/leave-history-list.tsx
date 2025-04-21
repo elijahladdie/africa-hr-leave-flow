@@ -1,12 +1,6 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -19,11 +13,11 @@ import { Eye, FileDown, Filter } from "lucide-react";
 
 interface LeaveRequest {
   id: string;
-  type: string;
+  leaveType: string;
   startDate: string;
   endDate: string;
   duration: string;
-  status: "pending" | "approved" | "rejected";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   reason?: string;
 }
 
@@ -35,12 +29,30 @@ export function LeaveHistoryList({ leaveRequests }: LeaveHistoryListProps) {
   // Map status to badge style
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "pending":
-        return <Badge variant="outline" className="leave-status-pending">Pending</Badge>;
-      case "approved":
-        return <Badge variant="outline" className="leave-status-approved">Approved</Badge>;
-      case "rejected":
-        return <Badge variant="outline" className="leave-status-rejected">Rejected</Badge>;
+      case "PENDING":
+        return (
+          <Badge variant="outline" className="leave-status-pending">
+            Pending
+          </Badge>
+        );
+      case "APPROVED":
+        return (
+          <Badge variant="outline" className="leave-status-approved">
+            Approved
+          </Badge>
+        );
+      case "REJECTED":
+        return (
+          <Badge variant="outline" className="leave-status-rejected">
+            Rejected
+          </Badge>
+        );
+      case "CANCELLED":
+        return (
+          <Badge variant="outline" className="leave-status-rejected">
+            Cancelled
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -51,7 +63,11 @@ export function LeaveHistoryList({ leaveRequests }: LeaveHistoryListProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-medium">Leave History</CardTitle>
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+          >
             <Filter className="h-4 w-4" />
             <span>Filter</span>
           </Button>
@@ -77,9 +93,12 @@ export function LeaveHistoryList({ leaveRequests }: LeaveHistoryListProps) {
               <TableBody>
                 {leaveRequests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="font-medium">{request.type}</TableCell>
+                    <TableCell className="font-medium">
+                      {request.leaveType}
+                    </TableCell>
                     <TableCell>
-                      {new Date(request.startDate).toLocaleDateString()} - {new Date(request.endDate).toLocaleDateString()}
+                      {new Date(request.startDate).toLocaleDateString()} -{" "}
+                      {new Date(request.endDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell>{request.duration}</TableCell>
                     <TableCell>{getStatusBadge(request.status)}</TableCell>
