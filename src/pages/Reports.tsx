@@ -1,15 +1,14 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  BarChart, 
-  PieChart, 
-  ChevronLeft, 
-  FileText, 
-  Download
+import {
+  BarChart,
+  PieChart,
+  ChevronLeft,
+  FileText,
+  Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { 
+import {
   BarChart as RechartsBarChart,
   Bar,
   XAxis,
@@ -20,17 +19,28 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Pie,
-  Cell
+  Cell,
 } from "recharts";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+// import {
+//   getLeaveReports,
+//   generateReport,
+//   exportReport
+// } from '@/store/slices/reportSlice';
+import { useAppDispatch, type RootState } from "@/store";
+import { exportReport, generateLeaveReport, getLeaveReports } from "@/store/slices/reportSlice";
+import { DateRange } from "@/types/reports";
 
 // Sample leave distribution data
 const leaveDistributionData = [
-  { month: "Jan", "Personal Time Off": 12, "Sick Leave": 5, "Other": 2 },
-  { month: "Feb", "Personal Time Off": 8, "Sick Leave": 7, "Other": 1 },
-  { month: "Mar", "Personal Time Off": 15, "Sick Leave": 4, "Other": 3 },
-  { month: "Apr", "Personal Time Off": 10, "Sick Leave": 6, "Other": 2 },
-  { month: "May", "Personal Time Off": 18, "Sick Leave": 8, "Other": 4 },
-  { month: "Jun", "Personal Time Off": 20, "Sick Leave": 5, "Other": 2 }
+  { month: "Jan", "Personal Time Off": 12, "Sick Leave": 5, Other: 2 },
+  { month: "Feb", "Personal Time Off": 8, "Sick Leave": 7, Other: 1 },
+  { month: "Mar", "Personal Time Off": 15, "Sick Leave": 4, Other: 3 },
+  { month: "Apr", "Personal Time Off": 10, "Sick Leave": 6, Other: 2 },
+  { month: "May", "Personal Time Off": 18, "Sick Leave": 8, Other: 4 },
+  { month: "Jun", "Personal Time Off": 20, "Sick Leave": 5, Other: 2 },
 ];
 
 // Sample leave type distribution data
@@ -39,7 +49,7 @@ const leaveTypeData = [
   { name: "Sick Leave", value: 35 },
   { name: "Maternity Leave", value: 12 },
   { name: "Compassionate", value: 8 },
-  { name: "Other", value: 14 }
+  { name: "Other", value: 14 },
 ];
 
 // Colors for the pie chart
@@ -50,42 +60,126 @@ const availableReports = [
   {
     id: "1",
     title: "Annual Leave Summary",
-    description: "Summary of all leave types taken by employees for the current year",
-    lastUpdated: "Today, 9:45 AM"
+    description:
+      "Summary of all leave types taken by employees for the current year",
+    lastUpdated: "Today, 9:45 AM",
   },
   {
     id: "2",
     title: "Department Absence Analysis",
-    description: "Analysis of absences per department including sick leave patterns",
-    lastUpdated: "Yesterday, 5:30 PM"
+    description:
+      "Analysis of absences per department including sick leave patterns",
+    lastUpdated: "Yesterday, 5:30 PM",
   },
   {
     id: "3",
     title: "Leave Balance Report",
     description: "Current leave balances for all employees",
-    lastUpdated: "Apr 12, 2023"
+    lastUpdated: "Apr 12, 2023",
   },
   {
     id: "4",
     title: "Public Holiday Schedule",
     description: "List of upcoming public holidays and affected employees",
-    lastUpdated: "Mar 28, 2023"
-  }
+    lastUpdated: "Mar 28, 2023",
+  },
 ];
 
 export default function Reports() {
+  const dispatch = useAppDispatch();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
+    start: "",
+    end: "",
+  });
+
+  const reports = useSelector((state: RootState) => state.reports.reports);
+  const error = useSelector((state: RootState) => state.reports.error);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setIsLoading(true);
+        const response = await dispatch(getLeaveReports()).unwrap();
+        console.log("Reports loaded:", response);
+      } catch (err) {
+        toast.error("Failed to load reports");
+        console.error("Reports loading error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReports();
+
+    return () => {
+      // Cleanup subscriptions
+    };
+  }, [dispatch]);
+
+  const handleGenerateReport = async (reportType: string) => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(
+        generateLeaveReport({
+          type: reportType,
+          startDate: selectedDateRange.start,
+          endDate: selectedDateRange.end,
+        })
+      ).unwrap();
+      console.log("Generated report:", response);
+      toast.success("Report generated successfully");
+    } catch (err) {
+      toast.error("Failed to generate report");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add function to handle date range selection
+  const handleDateRangeChange = (range: DateRange) => {
+    setSelectedDateRange(range);
+  };
+
+  // Add function to handle report download
+  const handleDownloadReport = async (reportId: string) => {
+    try {
+      const response = await dispatch(exportReport(reportId)).unwrap();
+      // Handle the blob response
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `report-${reportId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch (err) {
+      toast.error("Failed to download report");
+      console.error("Download error:", err);
+    }
+  };
+
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-8 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild className="mb-4">
-            <Link to="/" className="flex items-center text-muted-foreground hover:text-foreground">
+            <Link
+              to="/"
+              className="flex items-center text-muted-foreground hover:text-foreground"
+            >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold text-africa-terracotta">Reports</h1>
-          <p className="text-muted-foreground mt-1">View and generate leave management reports</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-africa-terracotta">
+            Reports
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            View and generate leave management reports
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -131,7 +225,9 @@ export default function Reports() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                <RechartsPieChart
+                  margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                >
                   <Pie
                     data={leaveTypeData}
                     cx="50%"
@@ -140,10 +236,15 @@ export default function Reports() {
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                   >
                     {leaveTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -160,7 +261,10 @@ export default function Reports() {
               <FileText className="h-5 w-5 mr-2 text-africa-terracotta" />
               Available Reports
             </h2>
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              onClick={() => handleGenerateReport("newReportType")}
+            >
               <Download className="h-4 w-4 mr-2" />
               Generate New Report
             </Button>
@@ -172,7 +276,13 @@ export default function Reports() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{report.title}</CardTitle>
-                    <Button size="sm" variant="secondary">Download</Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleDownloadReport(report.id)}
+                    >
+                      Download
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>

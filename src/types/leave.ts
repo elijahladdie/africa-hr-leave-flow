@@ -1,0 +1,34 @@
+export interface LeaveApplicationDTO {
+  leaveType: string;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  reason?: string;
+  documents?: File[];
+  submittedAt: string;
+}
+
+export interface LeaveRequest {
+  id: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  duration: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reason: string;
+}
+
+export interface LeaveHistoryState {
+  requests: LeaveRequest[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface LeaveRequestDTO {
+  leaveType: string;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  reason: string;
+  submittedAt: string;
+}

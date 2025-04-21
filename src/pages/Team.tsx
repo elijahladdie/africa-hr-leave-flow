@@ -3,66 +3,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-// Sample team members data with African names and roles
-const teamMembers = [
-  {
-    id: "1",
-    name: "Mohammed Ibrahim",
-    role: "Senior Software Engineer",
-    department: "Engineering",
-    email: "mohammed.ibrahim@ist.com",
-    avatar: undefined,
-    joinDate: "Jan 15, 2024",
-  },
-  {
-    id: "2",
-    name: "Amina Said",
-    role: "HR Manager",
-    department: "Human Resources",
-    email: "amina.said@ist.com",
-    avatar: undefined,
-    joinDate: "Mar 5, 2023",
-  },
-  {
-    id: "3",
-    name: "John Kamau",
-    role: "Product Manager",
-    department: "Product",
-    email: "john.kamau@ist.com",
-    avatar: undefined,
-    joinDate: "Oct 12, 2024",
-  },
-  {
-    id: "4",
-    name: "Fatima Ahmed",
-    role: "Finance Director",
-    department: "Finance",
-    email: "fatima.ahmed@ist.com",
-    avatar: undefined,
-    joinDate: "Feb 28, 2023",
-  },
-  {
-    id: "5",
-    name: "Daniel Osei",
-    role: "DevOps Engineer",
-    department: "Engineering",
-    email: "daniel.osei@ist.com",
-    avatar: undefined,
-    joinDate: "Jun 10, 2024",
-  },
-  {
-    id: "6",
-    name: "Grace Mutua",
-    role: "Marketing Lead",
-    department: "Marketing",
-    email: "grace.mutua@ist.com",
-    avatar: undefined,
-    joinDate: "Apr 15, 2023",
-  },
-];
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
+import { useAppDispatch, type RootState } from '@/store';
+import { createTeamMember, deleteTeamMember, getAllTeamMembers } from "@/store/slices/teamMemberSlice";
+import { TeamMemberDTO } from "@/types/dto";
 
 export default function Team() {
+    const dispatch = useAppDispatch()
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('');
+
+  const teamMembers = useSelector((state: RootState) => state.teamMembers.teamMembers);
+  const error = useSelector((state: RootState) => state.teams.error);
+
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await dispatch(getAllTeamMembers()).unwrap();
+        console.log('Team members loaded:', response);
+      } catch (err) {
+        toast.error('Failed to load team members');
+        console.error('Team loading error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeamData();
+
+    // Cleanup function
+    return () => {
+      // Reset any subscriptions or pending state
+    };
+  }, [dispatch]);
+
   // Function to get avatar initials
   const getInitials = (name: string) => {
     return name
@@ -70,6 +48,34 @@ export default function Team() {
       .map((part) => part[0])
       .join("")
       .toUpperCase();
+  };
+
+  const handleAddTeamMember = async (memberData: TeamMemberDTO) => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(
+        createTeamMember({
+          ...memberData,
+          joinedAt: new Date().toISOString()
+        })
+      ).unwrap();
+      console.log("New team member added:", response);
+      toast.success("Team member added successfully");
+    } catch (err) {
+      toast.error("Failed to add team member");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleRemoveTeamMember = async (memberId: string) => {
+    try {
+      const response = await dispatch(deleteTeamMember(memberId)).unwrap();
+      console.log("Team member removed:", response);
+      toast.success("Team member removed successfully");
+    } catch (err) {
+      toast.error("Failed to remove team member");
+    }
   };
 
   return (

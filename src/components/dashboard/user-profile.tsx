@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { UserCog } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface UserProfileProps {
   name: string;
@@ -61,13 +62,13 @@ export function UserProfile({
             <span className="font-medium">{joinDate}</span>
           </div>
           <div className="pt-3">
-            <a
-              href="/profile"
+            <Link
+              to="/profile"
               className="text-sm text-africa-blue hover:text-africa-blue/80 flex items-center transition-colors"
             >
               <UserCog className="h-3.5 w-3.5 mr-1" />
               Manage profile
-            </a>
+            </Link>
           </div>
         </div>
       </CardContent>

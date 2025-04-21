@@ -1,50 +1,35 @@
-
 import { ApprovalCard } from "@/components/approval/approval-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { getPendingApprovals, updateLeaveRequest } from "@/store/slices/approvalSlice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ApprovalDashboard() {
-  // Sample pending approval data
-  const pendingApprovals = [
-    {
-      id: "1",
-      employeeName: "Ibrahim Ahmed",
-      avatar: undefined,
-      leaveType: "Annual Leave",
-      startDate: "2025-05-15",
-      endDate: "2025-05-22",
-      duration: "6 days",
-      reason: "Family wedding celebration",
-      submittedDate: "2025-04-18",
-    },
-    {
-      id: "2",
-      employeeName: "Grace Mutua",
-      avatar: undefined,
-      leaveType: "Study Leave",
-      startDate: "2025-06-01",
-      endDate: "2025-06-05",
-      duration: "5 days",
-      reason: "Final examination period",
-      documentUrl: "/documents/exam-schedule.pdf",
-      submittedDate: "2025-04-19",
-    },
-    {
-      id: "3",
-      employeeName: "Zainab Omar",
-      avatar: undefined,
-      leaveType: "Sick Leave",
-      startDate: "2025-04-22",
-      endDate: "2025-04-23",
-      duration: "2 days",
-      reason: "Medical appointment",
-      documentUrl: "/documents/medical-note.pdf",
-      submittedDate: "2025-04-19",
-    },
-  ];
+  const dispatch = useAppDispatch();
+  const { pendingRequests, isLoading, error } = useAppSelector((state) => state.approvals);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const fetchApprovals = async () => {
+      try {
+        await dispatch(getPendingApprovals()).unwrap();
+      } catch (err) {
+        toast.error('Failed to load pending approvals');
+        console.error('Approvals loading error:', err);
+      }
+    };
+    fetchApprovals();
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, [dispatch]);
 
   // Sample history data
   const approvedRequests = [
@@ -75,6 +60,63 @@ export default function ApprovalDashboard() {
     },
   ];
 
+  const handleLeaveApproval = async (leaveId: string, status: 'APPROVED' | 'REJECTED', comment?: string) => {
+    setIsProcessing(true);
+    try {
+      const response = await dispatch(
+        updateLeaveRequest({
+          leaveId,
+          status,
+          comment
+        })
+      ).unwrap();
+      console.log("Leave request updated:", response);
+      toast.success(`Leave request ${status.toLowerCase()} successfully`);
+    } catch (err) {
+      toast.error("Failed to update leave request");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Update the pending TabsContent to show loading state
+  const renderPendingContent = () => (
+    <TabsContent value="pending" className="mt-0">
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2, 3].map((n) => (
+            <Skeleton key={n} className="h-[200px] w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="col-span-1 lg:col-span-2">
+          <CardContent className="py-10 text-center text-red-500">
+            <p>{error}</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {pendingRequests.map((approval) => (
+            <ApprovalCard
+              key={approval.id}
+              request={approval}
+              onApprove={(id) => handleLeaveApproval(id, 'APPROVED')}
+              onReject={(id) => handleLeaveApproval(id, 'REJECTED')}
+            />
+          ))}
+          
+          {pendingRequests.length === 0 && (
+            <Card className="col-span-1 lg:col-span-2">
+              <CardContent className="py-10 text-center">
+                <p className="text-muted-foreground">No pending leave requests to approve.</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+    </TabsContent>
+  );
+
   return (
     <div className="flex-1  p-8 ">
       <div className="max-w-6xl mx-auto">
@@ -100,28 +142,14 @@ export default function ApprovalDashboard() {
             <TabsTrigger value="pending" className="relative">
               Pending
               <span className="ml-1 bg-africa-terracotta text-white text-xs rounded-full px-1.5 py-0.5">
-                {pendingApprovals.length}
+                {pendingRequests.length}
               </span>
             </TabsTrigger>
             <TabsTrigger value="approved">Approved</TabsTrigger>
             <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="pending" className="mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {pendingApprovals.map((approval) => (
-                <ApprovalCard key={approval.id} request={approval} />
-              ))}
-              
-              {pendingApprovals.length === 0 && (
-                <Card className="col-span-1 lg:col-span-2">
-                  <CardContent className="py-10 text-center">
-                    <p className="text-muted-foreground">No pending leave requests to approve.</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
+          {renderPendingContent()}
           
           <TabsContent value="approved" className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

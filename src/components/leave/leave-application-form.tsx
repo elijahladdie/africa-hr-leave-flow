@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -37,47 +36,69 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
+import { LeaveApplicationDTO } from "@/types/leave";
+import { submitLeaveRequest } from "@/store/slices/leaveSlice";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "@/store";
 
 // Define the leave types based on Rwandan Labor Law
 const leaveTypes = [
-  { value: "pto", label: "Personal Time Off (PTO)" },
-  { value: "sick", label: "Sick Leave" },
-  { value: "maternity", label: "Maternity Leave" },
-  { value: "paternity", label: "Paternity Leave" },
-  { value: "compassionate", label: "Compassionate Leave" },
-  { value: "marriage", label: "Marriage Leave" },
-  { value: "exam", label: "Examination Leave" },
+  { value: "ANNUAL", label: "Personal Time Off (PTO)" },
+  { value: "SICK", label: "Sick Leave" },
+  { value: "PATERNITY", label: "Maternity Leave" },
+  { value: "MATERNITY", label: "Paternity Leave" },
+  { value: "OTHER", label: "Compassionate Leave" },
+  { value: "OTHER", label: "Marriage Leave" },
+  { value: "OTHER", label: "Examination Leave" },
 ];
+//  [, UNPAID, , , , ]!"
 
 // Determine if a leave type requires documentation
 const requiresDocumentation = (leaveType: string): boolean => {
-  return ["sick", "maternity", "compassionate", "exam"].includes(leaveType);
+  return ["SICK", "OTHER"].includes(leaveType);
 };
 
 // Form schema
-const formSchema = z.object({
-  leaveType: z.string({
-    required_error: "Please select a leave type",
-  }),
-  startDate: z.date({
-    required_error: "Please select a start date",
-  }),
-  endDate: z.date({
-    required_error: "Please select an end date",
-  }).refine(date => date instanceof Date, {
-    message: "Please select an end date",
-  }),
-  reason: z.string().optional(),
-  halfDay: z.boolean().default(false),
-  documentUpload: z.any().optional(),
-});
+const today = new Date();
+today.setHours(0, 0, 0, 0); // normalize time
+
+const formSchema = z
+  .object({
+    leaveType: z.string({
+      required_error: "Please select a leave type",
+    }),
+    startDate: z.date({
+      required_error: "Please select a start date",
+    }),
+    endDate: z.date({
+      required_error: "Please select an end date",
+    }),
+    reason: z.string().optional(),
+    halfDay: z.boolean().default(false),
+    documentUpload: z.any().optional(),
+  })
+  .refine((data) => data.startDate >= today, {
+    message: "Start date cannot be in the past",
+    path: ["startDate"],
+  })
+  .refine((data) => data.endDate >= data.startDate, {
+    message: "End date cannot be before start date",
+    path: ["endDate"],
+  });
+
 
 type LeaveFormValues = z.infer<typeof formSchema>;
 
 export function LeaveApplicationForm() {
-  const [selectedLeaveType, setSelectedLeaveType] = useState<string | null>(null);
+  const [selectedLeaveType, setSelectedLeaveType] = useState<string | null>(
+    null
+  );
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize the form
   const form = useForm<LeaveFormValues>({
@@ -88,16 +109,60 @@ export function LeaveApplicationForm() {
     },
   });
 
+  useEffect(() => {
+    const fetchleaveTypes = async () => {
+      try {
+        await dispatch(getLeaveTypes()).unwrap();
+      } catch (err) {
+        toast.error('Failed to load Leave Types approvals');
+        console.error('Approvals loading error:', err);
+      }
+    };
+    fetchleaveTypes();
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, [dispatch]);
   // Watch for leave type changes
   const watchLeaveType = form.watch("leaveType");
-  const needsDocumentation = selectedLeaveType ? requiresDocumentation(selectedLeaveType) : false;
+  const needsDocumentation = selectedLeaveType
+    ? requiresDocumentation(selectedLeaveType)
+    : false;
 
-  function onSubmit(data: LeaveFormValues) {
-    // Handle form submission
-    console.log("Form submitted:", data);
-    // You would send this data to your backend API
-    alert("Leave application submitted successfully!");
-  }
+  const handleLeaveSubmission = async (data: LeaveFormValues) => {
+    setIsSubmitting(true);
+    try {
+      // Prepare the leave request DTO
+      const leaveRequestDTO = {
+        leaveType: data.leaveType,
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString(),
+        halfDay: data.halfDay,
+        reason: data.reason || '',
+        submittedAt: new Date().toISOString()
+      };
+  
+      // Prepare the payload
+      const payload = {
+        leaveRequest: leaveRequestDTO,
+        document: data.documentUpload instanceof File ? data.documentUpload : undefined
+      };
+  
+      const response = await dispatch(
+        submitLeaveRequest(payload)
+      ).unwrap();
+  
+      console.log("Leave request submitted:", response);
+      toast.success("Leave request submitted successfully");
+      navigate("/my-requests");
+    } catch (err) {
+      toast.error("Failed to submit leave request");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Card className="africa-card max-w-2xl mx-auto animate-fade-in">
@@ -108,7 +173,10 @@ export function LeaveApplicationForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleLeaveSubmission)}
+            className="space-y-6"
+          >
             <FormField
               control={form.control}
               name="leaveType"
@@ -128,8 +196,8 @@ export function LeaveApplicationForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {leaveTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
+                      {leaveTypes.map((type, INDEX) => (
+                        <SelectItem key={INDEX} value={type.value}>
                           {type.label}
                         </SelectItem>
                       ))}
@@ -175,6 +243,7 @@ export function LeaveApplicationForm() {
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
+                          disabled={(date) => date < today || date == today}
                         />
                       </PopoverContent>
                     </Popover>
@@ -320,8 +389,8 @@ export function LeaveApplicationForm() {
             )}
 
             <div className="pt-4">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-africa-terracotta hover:bg-africa-terracotta/90"
               >
                 Submit Leave Request
