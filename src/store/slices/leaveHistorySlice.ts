@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { LeaveHistoryState, LeaveRequest } from '@/types/leave';
 import HttpRequest from '@/lib/HttpRequest';
 import { ResponseData } from '@/types';
+import { LeaveRequestDTO } from '@/types/dto';
 
 const initialState: LeaveHistoryState = {
   requests: [],
@@ -9,12 +10,15 @@ const initialState: LeaveHistoryState = {
   error: null,
 };
 
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
+
+
 export const fetchLeaveHistory = createAsyncThunk(
   'leaveHistory/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await HttpRequest.get<ResponseData>('/api/leave-requests/user');
-      return response;
+      const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/leave-requests/user`);
+      return response.data;
     } catch (error) {
       console.error('Failed to fetch leave history:', error);
       return rejectWithValue(error.message);
@@ -34,7 +38,7 @@ const leaveHistorySlice = createSlice({
       })
       .addCase(fetchLeaveHistory.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.requests = action.payload.data;
+        state.requests = action.payload;
       })
       .addCase(fetchLeaveHistory.rejected, (state, action) => {
         state.isLoading = false;

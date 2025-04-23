@@ -38,6 +38,7 @@ export interface TeamMember {
     department: string;
     avatar?: string;
     joinDate: string;
+    joinedAt: string;
     teamId: string;
 }
 

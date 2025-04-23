@@ -15,6 +15,7 @@ export default function LeaveHistory() {
     (state: RootState) => state.leaveHistory
   );
 
+
   useEffect(() => {
     const loadLeaveHistory = async () => {
       try {

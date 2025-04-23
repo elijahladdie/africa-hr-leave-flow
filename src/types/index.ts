@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface User {
   id: string;
   createdAt: string;
@@ -11,7 +12,7 @@ export interface User {
   role: 'STAFF' | 'ADMIN' | 'MANAGER';
   leaveBalances: string[];
   leaveRequests: string[];
-  teams: string[];
+  teams: TeamDTO[];
   active: boolean;
   username: string;
   enabled: boolean;
@@ -33,8 +34,9 @@ export interface Department {
 export type DepartmentDTO = Omit<Department, 'id'>;
 export type TeamDTO = {
   name: string;
+  id: string;
   description: string;
-  departmentId: string;
+  department: Department;
   managerId: string;
   memberIds: string[];
 };
@@ -44,4 +46,9 @@ export interface ResponseData {
   data: any;
   resp_msg: string;
   resp_code: number;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
 }

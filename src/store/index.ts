@@ -15,6 +15,9 @@ import reportReducer from './slices/reportSlice';
 import leaveReducer from './slices/leaveSlice';
 import approvalReducer from './slices/approvalSlice';
 import leaveHistoryReducer from './slices/leaveHistorySlice';
+import calendarReducer from './slices/calendarSlice';
+import notificationReducer from './slices/notificationSlice';
+import teamCalendarReducer from './slices/teamCalendarSlice';
 
 const persistConfig = {
   key: 'root',
@@ -35,6 +38,9 @@ const rootReducer = combineReducers({
   leave: leaveReducer,
   approvals: approvalReducer,
   leaveHistory: leaveHistoryReducer,
+  calendar: calendarReducer,
+  notifications: notificationReducer,
+  teamCalendar: teamCalendarReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

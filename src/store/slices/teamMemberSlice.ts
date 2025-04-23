@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // import { TeamMember, TeamMemberDTO } from '@/types/team';
 import { RootState } from '../index';
-import HttpRequest  from '@/lib/HttpRequest';
+import HttpRequest from '@/lib/HttpRequest';
 import { TeamMember, TeamMemberDTO } from '@/types/dto';
+import { ResponseData } from '@/types';
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
 
@@ -25,8 +26,8 @@ export const getAllTeamMembers = createAsyncThunk(
   'teamMembers/getAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await HttpRequest.get<TeamMember[]>(`${BASE_URL}/api/team-members`);
-      return response;
+      const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/team-members`);
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

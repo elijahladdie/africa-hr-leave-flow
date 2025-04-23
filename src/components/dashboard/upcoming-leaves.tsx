@@ -60,7 +60,7 @@ export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
               <div key={leave.id}>
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8 border border-border">
-                    <AvatarImage src={leave.avatar} />
+                    <AvatarImage src={leave.profilePictureUrl} />
                     <AvatarFallback className="bg-africa-sage/10 text-africa-sage text-xs">
                       {getInitials(leave.name)}
                     </AvatarFallback>

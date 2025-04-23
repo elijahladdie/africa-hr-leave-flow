@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { User } from '@/types';
+import { PaginationParams, ResponseData, User } from '@/types';
+import HttpRequest from '@/lib/HttpRequest';
+import { toast } from 'sonner';
 
 // Define pagination interface
-interface PaginationParams {
-  page: number;
-  limit: number;
-}
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
+
+
 
 // Define users state interface
 export interface UsersState {
@@ -31,12 +32,7 @@ const initialState: UsersState = {
 };
 
 // Define response type for users fetch
-interface UserResponse {
-  users: User[];
-  totalUsers: number;
-  totalPages: number;
-  currentPage: number;
-}
+
 
 // Define user update interface
 interface UserUpdateData {
@@ -46,28 +42,23 @@ interface UserUpdateData {
 
 // Async thunks for API operations
 export const fetchUsers = createAsyncThunk<
-  UserResponse,
+  ResponseData,
   PaginationParams,
   { rejectValue: string }
 >('users/fetchUsers', async (params, { rejectWithValue }) => {
   try {
     // Replace with actual API call
-    const response = await fetch(
-      `/api/users?page=${params.page}&limit=${params.limit}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+    const response = await HttpRequest.get<ResponseData>(
+      `${BASE_URL}/api/users?page=${params.page}&limit=${params.limit}`,
     );
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      return rejectWithValue(errorData.message || 'Failed to fetch users');
+
+    if (!response.data) {
+      const errorData = response.resp_msg;
+      toast.error(errorData || 'Failed to fetch users');
     }
-    
-    const data = await response.json();
-    return data;
+
+
+    return response;
   } catch (error) {
     return rejectWithValue('Network error occurred');
   }
@@ -85,12 +76,12 @@ export const fetchUserById = createAsyncThunk<
         'Content-Type': 'application/json',
       },
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       return rejectWithValue(errorData.message || 'Failed to fetch user');
     }
-    
+
     const data = await response.json();
     return data.user;
   } catch (error) {
@@ -112,12 +103,12 @@ export const updateUser = createAsyncThunk<
       },
       body: JSON.stringify(userData),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       return rejectWithValue(errorData.message || 'Failed to update user');
     }
-    
+
     const data = await response.json();
     return data.user;
   } catch (error) {
@@ -146,16 +137,16 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.users = action.payload.users;
-        state.totalUsers = action.payload.totalUsers;
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currentPage;
+        state.users = action.payload.data;
+        // state.totalUsers = action.payload.totalUsers;
+        // state.totalPages = action.payload.totalPages;
+        // state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || 'Failed to fetch users';
       });
-    
+
     // Fetch user by ID cases
     builder
       .addCase(fetchUserById.pending, (state) => {
@@ -170,7 +161,7 @@ const usersSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || 'Failed to fetch user';
       });
-    
+
     // Update user cases
     builder
       .addCase(updateUser.pending, (state) => {

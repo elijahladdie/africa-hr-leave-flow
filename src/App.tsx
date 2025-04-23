@@ -45,7 +45,11 @@ const AuthController = ({ children }: { children: React.ReactNode }) => {
       ((isAuthenticated || user) && location.pathname === "/login") ||
       (user?.teams?.length > 0 && location.pathname === "/auth/callback")
     ) {
-      navigate(from, { replace: true });
+      if (from !== "/login") {
+        navigate(from, { replace: true });
+      }else{
+        navigate("/");
+      }
 
       return;
     }

@@ -35,7 +35,7 @@ const Login = () => {
 
       toast.success(resp.resp_msg);
 
-      if (!resp.data.user.teams.length) {
+      if (!resp.data.user.teams.length && resp.data.user.role !== "ADMIN") {
         navigate(
           "/auth/callback?token=" + resp.data.token + "&disableRedirect=true "
         );
@@ -43,7 +43,7 @@ const Login = () => {
         navigate("/");
       }
     } catch (err: any) {
-      toast.error(err?.response?.resp_msg || "Invalid credentials", {
+      toast.error(err?.response?.data.resp_msg || "Invalid credentials", {
         description: err?.response?.resp_msg || "Invalid credentials",
       });
     }
@@ -55,11 +55,11 @@ const Login = () => {
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-africa-terracotta text-white mb-4">
-              <span className="font-bold text-xl">IST</span>
+              <span className="font-bold text-xl">LV</span>
             </div>
           </div>
           <h1 className="text-3xl font-semibold text-africa-dark">
-            IST Africa
+            LV Africa
           </h1>
           <p className="text-muted-foreground mt-2">Leave Management System</p>
         </div>
@@ -183,7 +183,7 @@ const Login = () => {
                 Forgot your password?
               </button>
               <p className="text-xs text-muted-foreground mt-4">
-                © {new Date().getFullYear()} IST Africa Ltd. All rights
+                © {new Date().getFullYear()} LV Africa Ltd. All rights
                 reserved.
               </p>
             </div>

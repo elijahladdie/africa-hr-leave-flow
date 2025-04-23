@@ -38,25 +38,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { LeaveApplicationDTO } from "@/types/leave";
-import { submitLeaveRequest } from "@/store/slices/leaveSlice";
+import { getLeaveTypes, submitLeaveRequest } from "@/store/slices/leaveSlice";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store";
 
-// Define the leave types based on Rwandan Labor Law
-const leaveTypes = [
-  { value: "ANNUAL", label: "Personal Time Off (PTO)" },
-  { value: "SICK", label: "Sick Leave" },
-  { value: "PATERNITY", label: "Maternity Leave" },
-  { value: "MATERNITY", label: "Paternity Leave" },
-  { value: "OTHER", label: "Compassionate Leave" },
-  { value: "OTHER", label: "Marriage Leave" },
-  { value: "OTHER", label: "Examination Leave" },
-];
-//  [, UNPAID, , , , ]!"
-
-// Determine if a leave type requires documentation
 const requiresDocumentation = (leaveType: string): boolean => {
   return ["SICK", "OTHER"].includes(leaveType);
 };
@@ -89,7 +75,6 @@ const formSchema = z
     path: ["endDate"],
   });
 
-
 type LeaveFormValues = z.infer<typeof formSchema>;
 
 export function LeaveApplicationForm() {
@@ -97,9 +82,10 @@ export function LeaveApplicationForm() {
     null
   );
   const dispatch = useAppDispatch();
+  const { leaveTypes } = useAppSelector((state) => state.leave);
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  console.log("Leave types from Redux:", leaveTypes);
   // Initialize the form
   const form = useForm<LeaveFormValues>({
     resolver: zodResolver(formSchema),
@@ -114,8 +100,8 @@ export function LeaveApplicationForm() {
       try {
         await dispatch(getLeaveTypes()).unwrap();
       } catch (err) {
-        toast.error('Failed to load Leave Types approvals');
-        console.error('Approvals loading error:', err);
+        toast.error("Failed to load Leave Types approvals");
+        console.error("Approvals loading error:", err);
       }
     };
     fetchleaveTypes();
@@ -123,7 +109,7 @@ export function LeaveApplicationForm() {
     return () => {
       // Cleanup if needed
     };
-  }, [dispatch]);
+  }, []);
   // Watch for leave type changes
   const watchLeaveType = form.watch("leaveType");
   const needsDocumentation = selectedLeaveType
@@ -139,26 +125,24 @@ export function LeaveApplicationForm() {
         startDate: data.startDate.toISOString(),
         endDate: data.endDate.toISOString(),
         halfDay: data.halfDay,
-        reason: data.reason || '',
-        submittedAt: new Date().toISOString()
+        reason: data.reason || "",
+        submittedAt: new Date().toISOString(),
       };
-  
+
       // Prepare the payload
       const payload = {
         leaveRequest: leaveRequestDTO,
-        document: data.documentUpload instanceof File ? data.documentUpload : undefined
+        document:
+          data.documentUpload instanceof File ? data.documentUpload : undefined,
       };
-  
-      const response = await dispatch(
-        submitLeaveRequest(payload)
-      ).unwrap();
-  
+
+      const response = await dispatch(submitLeaveRequest(payload)).unwrap();
+
       console.log("Leave request submitted:", response);
       toast.success("Leave request submitted successfully");
       navigate("/my-requests");
     } catch (err) {
-      toast.error("Failed to submit leave request");
-      console.error(err);
+      toast.error(err?.resp_msg || "Failed to submit leave request");
     } finally {
       setIsSubmitting(false);
     }
@@ -196,9 +180,9 @@ export function LeaveApplicationForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {leaveTypes.map((type, INDEX) => (
-                        <SelectItem key={INDEX} value={type.value}>
-                          {type.label}
+                      {leaveTypes.map((type, index) => (
+                        <SelectItem key={index} value={type.leaveType}>
+                          {type.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

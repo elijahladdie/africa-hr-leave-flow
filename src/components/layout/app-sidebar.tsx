@@ -29,6 +29,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import NotificationPopup from "../dashboard/notification-popup";
 
 type MenuItem = {
   title: string;
@@ -48,7 +49,7 @@ const menuItems: MenuItem[] = [
     title: "My Requests",
     url: "/my-requests",
     icon: FileText,
-    roles: ["STAFF", "MANAGER", "ADMIN"],
+    roles: ["STAFF", "MANAGER"],
   },
   {
     title: "Team Calendar",
@@ -90,8 +91,8 @@ export function AppSidebar() {
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
-    if (!user?.name) return "U";
-    return user.name
+    if (!user?.fullName) return "U";
+    return user.fullName
       .split(" ")
       .map((part) => part[0])
       .join("")
@@ -110,16 +111,16 @@ export function AppSidebar() {
       </div>
     );
   }
-
+console.log(user, "user in app sidebar");
   return (
     <Sidebar className="transition-all duration-300">
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <span className="font-semibold text-lg text-white">IST</span>
+            <span className="font-semibold text-lg text-white">LV</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-medium text-sm">IST Africa</span>
+            <span className="font-medium text-sm">LV Africa</span>
             <span className="text-xs text-muted-foreground">
               Leave Management
             </span>
@@ -137,13 +138,13 @@ export function AppSidebar() {
         {/* User info */}
         <div className="mb-6 px-3 py-2 flex items-center space-x-3">
           <Avatar className="h-10 w-10 border-2 border-primary/10">
-            <AvatarImage src={user?.avatar} alt={user?.name} />
+            <AvatarImage src={user?.profilePictureUrl} alt={user?.fullName} />
             <AvatarFallback className="bg-primary/10 text-primary">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
           <div className="truncate">
-            <p className="text-sm font-medium">{user?.name}</p>
+            <p className="text-sm font-medium">{user?.fullName}</p>
             <p className="text-xs text-muted-foreground truncate">
               {user?.email}
             </p>
@@ -152,13 +153,7 @@ export function AppSidebar() {
 
         {/* Notification Button */}
         <div className="mb-4 px-3">
-          <Button variant="outline" className="w-full justify-start" size="sm">
-            <Bell className="h-4 w-4 mr-2" />
-            <span>Notifications</span>
-            <span className="ml-auto bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3
-            </span>
-          </Button>
+          <NotificationPopup />
         </div>
 
         <SidebarGroup>
@@ -216,7 +211,7 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <div className="mt-6 text-xs text-muted-foreground text-center">
-            <p>IST Africa Leave System</p>
+            <p>LV Africa Leave System</p>
             <p>v1.0.0</p>
           </div>
         </div>

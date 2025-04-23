@@ -23,8 +23,7 @@ export function UserProfile({
   joinDate,
 }: UserProfileProps) {
   // Get initials from name
-  const initials = name
-    .split(" ")
+  const initials = name?.split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase();

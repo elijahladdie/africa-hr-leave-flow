@@ -26,7 +26,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(() => getData());
-  console.log("======== USER ========", user);
   // Initialize auth state from localStorage on mount
   useEffect(() => {
     const storedUser = getData();
@@ -69,7 +68,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     // Show success message
     toast.success("Login successful! ===><", {
-      description: "Welcome to IST Africa Leave Management System",
+      description: "Welcome to LV Africa Leave Management System",
     });
 
     return true;
