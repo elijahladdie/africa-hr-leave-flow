@@ -14,7 +14,7 @@ export interface LeaveRequest {
   startDate: string;
   endDate: string;
   duration: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'APPROVED' | 'REJECTED' | 'PENDING';
   reason: string;
 }
 

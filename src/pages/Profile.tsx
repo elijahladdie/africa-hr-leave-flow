@@ -1,31 +1,49 @@
 import { UserProfile } from "@/components/dashboard/user-profile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { getUserProfile } from "@/store/slices/userSlice";
+import { format } from "date-fns";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function UserProfilePage() {
-  const mockUser = {
-    name: "Jane Doe",
-    role: "Product Manager",
-    department: "Product",
-    manager: "John Smith",
-    avatarUrl: "/images/users/jane.jpg",
-    joinDate: "2022-05-10",
-    email: "jane.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "Nairobi, Kenya",
-    bio: "Driven product leader with a passion for user-centric design and team collaboration.",
-  };
+  const dispatch = useAppDispatch();
+
+  const user = useAppSelector((state) => state.user.user);
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        await dispatch(getUserProfile()).unwrap();
+      } catch (err) {
+        toast.error(
+          err.response.data.resp_msg || "FaiLed to load user profile"
+        );
+      }
+    };
+    fetchUserProfile();
+  }, []);
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
+  const primaryTeam = user.teams?.[0];
+  const department = primaryTeam?.department?.name || "N/A";
+  const manager = primaryTeam?.managerName || "N/A";
+  const joinDate = user.createdAt || new Date().toISOString(); // fallback if needed
+  const avatarUrl = user.profilePictureUrl || "/images/default-avatar.png";
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       {/* User Profile Card */}
       <UserProfile
-        name={mockUser.name}
-        role={mockUser.role}
-        department={mockUser.department}
-        manager={mockUser.manager}
-        avatarUrl={mockUser.profilePictureUrlUrl}
-        joinDate={mockUser.joinDate}
+        name={user.fullName}
+        role={user.role}
+        department={department}
+        manager={manager}
+        avatarUrl={avatarUrl}
+        joinDate={format(new Date(joinDate), "yyyy-MM-dd")}
+        isLinkHidden={true} // Hide the link to the profile page
       />
 
       {/* Additional Information */}
@@ -35,23 +53,24 @@ export default function UserProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Email:</span>
-            <span className="font-medium">{mockUser.email}</span>
+            <span className="text-muted-foreground">Email: </span>
+            <span className="font-medium">{user.email}</span>
           </div>
           <Separator />
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Phone:</span>
-            <span className="font-medium">{mockUser.phone}</span>
-          </div>
-          <Separator />
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Location:</span>
-            <span className="font-medium">{mockUser.location}</span>
+            <span className="text-muted-foreground">Azure AD ID: </span>
+            <span className="font-medium">{user.azureId}</span>
           </div>
           <Separator />
           <div>
-            <span className="text-muted-foreground">Bio:</span>
-            <p className="mt-1 font-medium">{mockUser.bio}</p>
+            <span className="text-muted-foreground">Teams: </span>
+            <ul className="list-disc list-inside mt-1 font-medium">
+              {user.teams?.map((team) => (
+                <li key={team.id}>
+                  {team.name} ({team.department?.name})
+                </li>
+              ))}
+            </ul>
           </div>
         </CardContent>
       </Card>

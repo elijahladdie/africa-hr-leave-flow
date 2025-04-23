@@ -24,141 +24,132 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-// import {
-//   getLeaveReports,
-//   generateReport,
-//   exportReport
-// } from '@/store/slices/reportSlice';
-import { useAppDispatch, type RootState } from "@/store";
-import { exportReport, generateLeaveReport, getLeaveReports } from "@/store/slices/reportSlice";
+import { useAppDispatch, useAppSelector, type RootState } from "@/store";
+
 import { DateRange } from "@/types/reports";
-
-// Sample leave distribution data
-const leaveDistributionData = [
-  { month: "Jan", "Personal Time Off": 12, "Sick Leave": 5, Other: 2 },
-  { month: "Feb", "Personal Time Off": 8, "Sick Leave": 7, Other: 1 },
-  { month: "Mar", "Personal Time Off": 15, "Sick Leave": 4, Other: 3 },
-  { month: "Apr", "Personal Time Off": 10, "Sick Leave": 6, Other: 2 },
-  { month: "May", "Personal Time Off": 18, "Sick Leave": 8, Other: 4 },
-  { month: "Jun", "Personal Time Off": 20, "Sick Leave": 5, Other: 2 },
-];
-
-// Sample leave type distribution data
-const leaveTypeData = [
-  { name: "Personal Time Off", value: 83 },
-  { name: "Sick Leave", value: 35 },
-  { name: "Maternity Leave", value: 12 },
-  { name: "Compassionate", value: 8 },
-  { name: "Other", value: 14 },
-];
+import { fetchLeaveHistory } from "@/store/slices/leaveHistorySlice";
+import { getLeaveTypes } from "@/store/slices/leaveSlice";
+import { getUserProfile } from "@/store/slices/userSlice";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Colors for the pie chart
 const COLORS = ["#E57373", "#64B5F6", "#81C784", "#FFD54F", "#9575CD"];
 
-// Available reports list
-const availableReports = [
-  {
-    id: "1",
-    title: "Annual Leave Summary",
-    description:
-      "Summary of all leave types taken by employees for the current year",
-    lastUpdated: "Today, 9:45 AM",
-  },
-  {
-    id: "2",
-    title: "Department Absence Analysis",
-    description:
-      "Analysis of absences per department including sick leave patterns",
-    lastUpdated: "Yesterday, 5:30 PM",
-  },
-  {
-    id: "3",
-    title: "Leave Balance Report",
-    description: "Current leave balances for all employees",
-    lastUpdated: "Apr 12, 2023",
-  },
-  {
-    id: "4",
-    title: "Public Holiday Schedule",
-    description: "List of upcoming public holidays and affected employees",
-    lastUpdated: "Mar 28, 2023",
-  },
-];
-
 export default function Reports() {
   const dispatch = useAppDispatch();
-
+  const { requests } = useAppSelector((state) => state.leaveHistory);
+  const { leaveTypes } = useAppSelector((state) => state.leave);
+  const { user } = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(true);
-  const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
     start: "",
     end: "",
   });
 
-  const reports = useSelector((state: RootState) => state.reports.reports);
-  const error = useSelector((state: RootState) => state.reports.error);
-
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await dispatch(getLeaveReports()).unwrap();
-        console.log("Reports loaded:", response);
+        await Promise.all([
+          dispatch(fetchLeaveHistory()).unwrap(),
+          dispatch(getLeaveTypes()).unwrap(),
+          dispatch(getUserProfile()).unwrap(),
+        ]);
       } catch (err) {
-        toast.error("Failed to load reports");
-        console.error("Reports loading error:", err);
+        toast.error("Failed to load report data");
+        console.error("Data loading error:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReports();
-
-    return () => {
-      // Cleanup subscriptions
-    };
+    fetchData();
   }, [dispatch]);
 
-  const handleGenerateReport = async (reportType: string) => {
-    setIsLoading(true);
-    try {
-      const response = await dispatch(
-        generateLeaveReport({
-          type: reportType,
-          startDate: selectedDateRange.start,
-          endDate: selectedDateRange.end,
-        })
-      ).unwrap();
-      console.log("Generated report:", response);
-      toast.success("Report generated successfully");
-    } catch (err) {
-      toast.error("Failed to generate report");
-    } finally {
-      setIsLoading(false);
+  // Transform leave history data for the bar chart
+  const leaveDistributionData = requests.reduce((acc, request) => {
+    const month = new Date(request.startDate).toLocaleString("default", {
+      month: "short",
+    });
+    const leaveType = request.leaveType;
+
+    const monthData = acc.find((item) => item.month === month) || {
+      month,
+      "Annual Leave": 0,
+      "Sick Leave": 0,
+      Other: 0,
+    };
+
+    if (leaveType === "ANNUAL") {
+      monthData["Annual Leave"]++;
+    } else if (leaveType === "SICK") {
+      monthData["Sick Leave"]++;
+    } else {
+      monthData["Other"]++;
     }
+
+    if (!acc.find((item) => item.month === month)) {
+      acc.push(monthData);
+    }
+
+    return acc;
+  }, []);
+
+  // Transform leave types data for the pie chart
+  const leaveTypeData = leaveTypes.map((type) => ({
+    name: type.name,
+    value: requests.filter((req) => req.leaveType === type.leaveType).length,
+  }));
+
+  // Generate reports based on user's leave balances
+  const availableReports = [
+    {
+      id: "leave-summary",
+      title: "Leave Summary Report",
+      description: "Summary of all leave requests and their status",
+      data: requests,
+      lastUpdated: new Date().toLocaleString(),
+    },
+    {
+      id: "balance-report",
+      title: "Leave Balance Report",
+      description: "Current leave balances for all leave types",
+      data: user?.leaveBalances || [],
+      lastUpdated: new Date().toLocaleString(),
+    },
+  ];
+
+  const handleDownloadReport = (reportId: string) => {
+    const report = availableReports.find((r) => r.id === reportId);
+    if (!report) return;
+
+    // Create CSV content
+    const csvContent = generateCSVContent(report.data);
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `${report.title}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
   };
 
-  // Add function to handle date range selection
-  const handleDateRangeChange = (range: DateRange) => {
-    setSelectedDateRange(range);
-  };
+  const generateCSVContent = (data: any[]) => {
+    if (!data.length) return "";
 
-  // Add function to handle report download
-  const handleDownloadReport = async (reportId: string) => {
-    try {
-      const response = await dispatch(exportReport(reportId)).unwrap();
-      // Handle the blob response
-      const url = window.URL.createObjectURL(new Blob([response]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `report-${reportId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-    } catch (err) {
-      toast.error("Failed to download report");
-      console.error("Download error:", err);
-    }
+    const headers = Object.keys(data[0]);
+    const rows = data.map((item) => headers.map((header) => item[header]));
+
+    return [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
   };
 
   return (
@@ -207,7 +198,7 @@ export default function Reports() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="Personal Time Off" fill="#E57373" />
+                  <Bar dataKey="Annual Leave" fill="#E57373" />
                   <Bar dataKey="Sick Leave" fill="#64B5F6" />
                   <Bar dataKey="Other" fill="#81C784" />
                 </RechartsBarChart>
@@ -261,13 +252,6 @@ export default function Reports() {
               <FileText className="h-5 w-5 mr-2 text-africa-terracotta" />
               Available Reports
             </h2>
-            <Button
-              variant="outline"
-              onClick={() => handleGenerateReport("newReportType")}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Generate New Report
-            </Button>
           </div>
 
           <div className="space-y-4">
@@ -296,6 +280,90 @@ export default function Reports() {
               </Card>
             ))}
           </div>
+        </div>
+
+        {/* Leave Balance Table */}
+
+        <div className="overflow-x-auto mt-8 space-y-2">
+          <Card className="africa-card animate-fade-in">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-medium">
+                Leave Balances
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Leave Type</TableHead>
+                      <TableHead>Allocated</TableHead>
+                      <TableHead>Used</TableHead>
+                      <TableHead>Remaining</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {user?.leaveBalances?.map((bal, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="font-medium">
+                          {bal.leaveType}
+                        </TableCell>
+                        <TableCell>{bal.totalDays} days</TableCell>
+                        <TableCell>{bal.usedDays} days</TableCell>
+                        <TableCell>{bal.remainingDays} days</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Leave Requests Table */}
+
+        <div className="overflow-x-auto mt-8">
+          <Card className="africa-card animate-fade-in">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-medium">
+                Leave Requests
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Leave Type</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        comments
+                      </TableHead>
+                      <TableHead>Start Date</TableHead>
+                      <TableHead>End Date</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {requests.map((req) => (
+                      <TableRow key={req.id}>
+                        <TableCell className="font-medium">
+                          {req.leaveType}
+                        </TableCell>
+                        <TableCell>{req.reason}</TableCell>
+                        <TableCell className="hidden md:table-cell max-w-xs truncate">
+                          {req.reason}
+                        </TableCell>
+                        <TableCell>{req.startDate}</TableCell>
+                        <TableCell>{req.endDate}</TableCell>
+                        <TableCell>{req.status}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

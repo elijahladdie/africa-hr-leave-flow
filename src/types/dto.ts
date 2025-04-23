@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface LeaveRequestDTO {
     startDate: string;
     endDate: string;
@@ -10,8 +11,9 @@ export interface TeamDTO {
     id: number;
     name: string;
     description: string;
-    departmentId: string;
+    department: any;
     managerId: string;
+    teamMemberIds?: string[];
 }
 
 export interface DepartmentDTO {

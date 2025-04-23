@@ -24,18 +24,22 @@ import {
 
 const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
   const [selectedMembers, setSelectedMembers] = useState([]);
 
-
   const onSubmit = (data) => {
-    // Add selected members to the data
     data.teamMemberIds = selectedMembers;
-    
-    // Submit the data
+    data.department = { id: data.departmentId };
+    data.manager = { id: data.managerId };
+    if (data.departmentId) delete data.departmentId;
+    if (data.managerId) delete data.managerId;
     onCreateTeam(data);
-    
-    // Close dialog and reset form
     setOpen(false);
     reset();
     setSelectedMembers([]);
@@ -43,7 +47,7 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
 
   const handleSelectMember = (userId) => {
     if (selectedMembers.includes(userId)) {
-      setSelectedMembers(selectedMembers.filter(id => id !== userId));
+      setSelectedMembers(selectedMembers.filter((id) => id !== userId));
     } else {
       setSelectedMembers([...selectedMembers, userId]);
     }
@@ -64,12 +68,14 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Team Name</Label>
-            <Input 
-              id="name" 
-              {...register("name", { required: true })} 
+            <Input
+              id="name"
+              {...register("name", { required: true })}
               className={errors.name ? "border-red-500" : ""}
             />
-            {errors.name && <p className="text-xs text-red-500">Team name is required</p>}
+            {errors.name && (
+              <p className="text-xs text-red-500">Team name is required</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -100,7 +106,7 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
                 <SelectValue placeholder="Select Manager" />
               </SelectTrigger>
               <SelectContent>
-                {users.map((user) => (
+                {users.filter((user) => user.role === 'MANAGER').map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.fullName}
                   </SelectItem>
@@ -112,7 +118,7 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
           <div className="space-y-2">
             <Label>Team Members</Label>
             <div className="border rounded-md p-2 max-h-40 overflow-y-auto">
-              {users.map((user) => (
+              {users.filter((user) => user.role === 'STAFF').map((user) => (
                 <div key={user.id} className="flex items-center space-x-2 p-1">
                   <input
                     type="checkbox"
@@ -121,17 +127,26 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
                     onChange={() => handleSelectMember(user.id)}
                     className="rounded"
                   />
-                  <label htmlFor={`user-${user.id}`} className="text-sm">{user.fullName}</label>
+                  <label htmlFor={`user-${user.id}`} className="text-sm">
+                    {user.fullName}
+                  </label>
                 </div>
               ))}
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="bg-africa-terracotta hover:bg-africa-terracotta/90">
+            <Button
+              type="submit"
+              className="bg-africa-terracotta hover:bg-africa-terracotta/90"
+            >
               Create Team
             </Button>
           </DialogFooter>

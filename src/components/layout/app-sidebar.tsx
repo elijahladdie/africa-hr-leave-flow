@@ -49,7 +49,7 @@ const menuItems: MenuItem[] = [
     title: "My Requests",
     url: "/my-requests",
     icon: FileText,
-    roles: ["STAFF", "MANAGER"],
+    roles: ["STAFF"],
   },
   {
     title: "Team Calendar",
@@ -111,7 +111,7 @@ export function AppSidebar() {
       </div>
     );
   }
-console.log(user, "user in app sidebar");
+  console.log(user, "user in app sidebar");
   return (
     <Sidebar className="transition-all duration-300">
       <SidebarHeader>

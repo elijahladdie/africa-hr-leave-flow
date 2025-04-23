@@ -7,7 +7,7 @@ import {
 } from "@/store/slices/departmentSlice";
 import { getAllUsers, updateUserRole } from "@/store/slices/userSlice";
 import type { DepartmentDTO, UserRoleUpdateDTO } from "@/types/admin";
-import { useAppDispatch, type RootState } from "@/store";
+import { useAppDispatch, useAppSelector, type RootState } from "@/store";
 import { LeaveTypeManagement } from "@/components/admin/leave-type-management";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,10 +21,10 @@ export default function AdminSettings() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get data from Redux store
-  const departments = useSelector(
+  const departments = useAppSelector(
     (state: RootState) => state.departments.departments
   );
-  const users = useSelector((state: RootState) => state.users.users);
+  const users = useAppSelector((state: RootState) => state.user.users);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -45,7 +45,7 @@ export default function AdminSettings() {
 
     fetchInitialData();
   }, [dispatch]);
-
+console.log(users, "><><<><><><><")
   const handleDepartmentUpdate = async (departmentData: DepartmentDTO) => {
     setIsSaving(true);
     try {
@@ -196,10 +196,6 @@ export default function AdminSettings() {
               <Database className="h-4 w-4 mr-2" />
               Departments
             </TabsTrigger>
-            <TabsTrigger value="general" className="flex items-center">
-              <Sliders className="h-4 w-4 mr-2" />
-              General
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="leave-types" className="mt-0">
@@ -212,21 +208,6 @@ export default function AdminSettings() {
 
           <TabsContent value="departments" className="mt-0">
             {renderDepartmentsContent()}
-          </TabsContent>
-
-          <TabsContent value="general" className="mt-0">
-            <Card className="africa-card animate-fade-in">
-              <CardHeader>
-                <CardTitle className="text-lg font-medium">
-                  General Settings
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="py-10 text-center">
-                <p className="text-muted-foreground">
-                  General settings interface will be available soon.
-                </p>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>

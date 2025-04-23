@@ -110,8 +110,8 @@ export default function TeamCalendarPage() {
               value={selectedDepartment}
               onValueChange={setSelectedDepartment}
             >
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Select Department" />
+              <SelectTrigger className="w-full sm:w-[180px]" >
+                <SelectValue placeholder="Select Department"/>
               </SelectTrigger>
               <SelectContent>
                 {departments.map((dept) => (
@@ -121,10 +121,6 @@ export default function TeamCalendarPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="flex items-center">
-              <Filter className="h-4 w-4 mr-2" />
-              More Filters
-            </Button>
           </div>
           <div className="flex items-center gap-2">
             <Tabs
@@ -138,14 +134,7 @@ export default function TeamCalendarPage() {
                 <TabsTrigger value="list">List View</TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden md:flex items-center"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
+           
           </div>
         </div>
 

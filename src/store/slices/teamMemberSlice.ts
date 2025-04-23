@@ -52,10 +52,10 @@ export const createTeamMember = createAsyncThunk(
   'teamMembers/create',
   async (data: TeamMemberDTO, { rejectWithValue }) => {
     try {
-      const response = await HttpRequest.post<TeamMember>(`${BASE_URL}/api/team-members`, data);
-      return response;
+      const response = await HttpRequest.post<ResponseData>(`${BASE_URL}/api/team-members`, data);
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response.data);
     }
   }
 );
@@ -127,8 +127,8 @@ const teamMemberSlice = createSlice({
       })
       // Create team member
       .addCase(createTeamMember.fulfilled, (state, action) => {
-        state.teamMembers.push(action.payload);
-        state.currentTeamMember = action.payload;
+        state.teamMembers.push(action.payload.data);
+        state.currentTeamMember = action.payload.data;
       })
       // Update team member
       .addCase(updateTeamMember.fulfilled, (state, action) => {

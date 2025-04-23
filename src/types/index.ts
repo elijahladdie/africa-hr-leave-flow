@@ -10,7 +10,7 @@ export interface User {
   azureId: string;
   profilePictureUrl: string;
   role: 'STAFF' | 'ADMIN' | 'MANAGER';
-  leaveBalances: string[];
+  leaveBalances: any[];
   leaveRequests: string[];
   teams: TeamDTO[];
   active: boolean;
@@ -37,6 +37,7 @@ export type TeamDTO = {
   id: string;
   description: string;
   department: Department;
+  managerName?: string;
   managerId: string;
   memberIds: string[];
 };
