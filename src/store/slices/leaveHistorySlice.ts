@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { LeaveHistoryState, LeaveRequest } from '@/types/leave';
 import HttpRequest from '@/lib/HttpRequest';
 import { ResponseData } from '@/types';
-import { LeaveRequestDTO } from '@/types/dto';
 
 const initialState: LeaveHistoryState = {
   requests: [],

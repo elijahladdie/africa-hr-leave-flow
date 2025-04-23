@@ -1,73 +1,135 @@
-# Welcome to your Lovable project
+# Africa HR Leave Management System
 
-## Project info
+A modern leave management system built for African organizations to streamline leave requests, approvals, and team management.
 
-**URL**: https://lovable.dev/projects/b170bbd7-1e48-4aef-a4ec-aeef22df9a98
+## System Access
 
-## How can I edit this code?
+### User Roles & Permissions
 
-There are several ways of editing your application.
+The system supports three main user roles:
 
-**Use Lovable**
+#### 1. Staff Members
+- Access the dashboard to view leave balances
+- Submit leave requests
+- View personal leave history
+- Access team calendar
+- View team members' leave schedules
+- Receive notifications for leave request updates
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b170bbd7-1e48-4aef-a4ec-aeef22df9a98) and start prompting.
+#### 2. Managers
+All Staff permissions, plus:
+- Review and approve/reject team members' leave requests
+- Access team management features
+- View team analytics
+- Manage team calendar
+- Generate team reports
+- Receive notifications for team leave requests
 
-Changes made via Lovable will be committed automatically to this repo.
+#### 3. Administrators
+All Manager permissions, plus:
+- Manage user accounts
+- Configure system settings
+- Define leave types and policies
+- Generate organizational reports
+- Manage departments and teams
+- Set up holiday calendar
+- System-wide configurations
 
-**Use your preferred IDE**
+### Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Account Creation**
+   - New users receive an invitation email
+   - Click the invitation link to set up your account
+   - Complete your profile with required information
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Logging In**
+   ```
+   URL: https://your-domain.com/login
+   Required: Email and password
+   ```
 
-Follow these steps:
+3. **Navigation**
+   - Use the sidebar menu to access features
+   - Dashboard is your starting point
+   - Menu items vary based on your role
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Key Features by Role
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+#### Staff Members Can:
+- Submit leave requests
+- Track leave balances
+- View leave history
+- Access team calendar
+- Receive notifications
+- Update profile information
 
-# Step 3: Install the necessary dependencies.
-npm i
+#### Managers Can:
+- Manage team leave requests
+- View team calendar
+- Access team analytics
+- Generate team reports
+- Manage team members
+- Review leave balances
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+#### Administrators Can:
+- Manage user accounts
+- Configure system settings
+- Define leave policies
+- Generate reports
+- Manage departments
+- Set up holidays
 
-**Edit a file directly in GitHub**
+### Technical Requirements
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Internet connection
+- Supported devices:
+  - Desktop computers
+  - Tablets
+  - Mobile phones
 
-**Use GitHub Codespaces**
+### Support
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+For technical support:
+- Email: support@your-domain.com
+- Help Center: https://help.your-domain.com
+- Contact your system administrator
 
-## What technologies are used for this project?
+### Security
 
-This project is built with:
+- Role-based access control
+- Secure authentication
+- Data encryption
+- Session management
+- Regular security updates
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Best Practices
 
-## How can I deploy this project?
+1. **For Staff:**
+   - Submit leave requests in advance
+   - Keep profile information updated
+   - Check team calendar before planning leave
 
-Simply open [Lovable](https://lovable.dev/projects/b170bbd7-1e48-4aef-a4ec-aeef22df9a98) and click on Share -> Publish.
+2. **For Managers:**
+   - Review leave requests promptly
+   - Monitor team leave patterns
+   - Keep team calendar updated
 
-## Can I connect a custom domain to my Lovable project?
+3. **For Administrators:**
+   - Regularly review system settings
+   - Monitor user accounts
+   - Keep policies updated
 
-Yes, you can!
+### System Updates
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The system is regularly updated with:
+- Security patches
+- Feature improvements
+- Bug fixes
+- Performance enhancements
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Current Version: v1.0.0
+
+### License
+
+Copyright © 2024 Your Organization

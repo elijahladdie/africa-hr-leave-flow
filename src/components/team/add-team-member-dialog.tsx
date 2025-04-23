@@ -32,7 +32,8 @@ const AddTeamMemberForm = ({ teams, availableUsers, onAddMember }) => {
   } = useForm();
 
   const onSubmit = (data) => {
-    // Submit the data
+    data.user = { id: data.userId };
+    if (data.userId) delete data.userId;
     onAddMember(data);
 
     // Close dialog and reset form
@@ -82,37 +83,15 @@ const AddTeamMemberForm = ({ teams, availableUsers, onAddMember }) => {
                 <SelectValue placeholder="Select User" />
               </SelectTrigger>
               <SelectContent>
-                {availableUsers.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.fullName}
-                  </SelectItem>
-                ))}
+                {availableUsers
+                  .filter((user) => user.role === "STAFF")
+                  .map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.fullName}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">Select Role</Label>
-            <Select onValueChange={(value) => setValue("role", value)} required>
-              <SelectTrigger id="role">
-                <SelectValue placeholder="Select Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem key={"STAFF"} value={"STAFF"}>
-                  Staff
-                </SelectItem>
-                <SelectItem key={"MANAGER"} value={"MANAGER"}>
-                  Manager
-                </SelectItem>
-                <SelectItem key={"ADMIN"} value={"ADMIN"}>
-                  Admin
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            {errors.role && (
-              <p className="text-xs text-red-500">Role is required</p>
-            )}
           </div>
 
           <DialogFooter>

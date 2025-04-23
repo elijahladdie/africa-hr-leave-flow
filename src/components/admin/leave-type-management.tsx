@@ -323,7 +323,6 @@ export function LeaveTypeManagement() {
                 <TableHead className="hidden md:table-cell">Description</TableHead>
                 <TableHead>Documentation</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -344,25 +343,6 @@ export function LeaveTypeManagement() {
                       } mr-1`}
                     ></span>
                     {type.active ? "Active" : "Inactive"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(type.id)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(type.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </TableCell>
                 </TableRow>
               ))}

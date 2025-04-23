@@ -6,7 +6,6 @@ import storage from 'redux-persist/lib/storage';
 // Import reducers
 import authReducer from './slices/authSlice';
 import usersReducer from './slices/usersSlice';
-import tasksReducer from './slices/tasksSlice';
 import userReducer from './slices/userSlice';
 import departmentReducer from './slices/departmentSlice';
 import teamReducer from './slices/teamSlice';
@@ -29,7 +28,6 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   users: usersReducer,
-  tasks: tasksReducer,
   user: userReducer,
   departments: departmentReducer,
   teams: teamReducer,

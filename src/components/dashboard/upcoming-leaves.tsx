@@ -2,18 +2,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-
-interface TeamMemberLeave {
-  id: string;
-  name: string;
-  avatar?: string;
-  startDate: string;
-  endDate: string;
-  leaveType: string;
-}
+import { LeaveRequest } from "@/types/leave";
+import { startOfWeek, endOfWeek, parseISO, isWithinInterval, isBefore, isAfter } from 'date-fns';
+// interface TeamMemberLeave {
+//   id: string;
+//   name: string;
+//   avatar?: string;
+//   startDate: string;
+//   endDate: string;
+//   leaveType: string;
+// }
 
 interface UpcomingLeavesProps {
-  leaves: TeamMemberLeave[];
+  leaves: LeaveRequest[];
 }
 
 export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
@@ -43,9 +44,12 @@ export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
     
     return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
   };
-
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });     // Sunday
+  
   return (
-    <Card className="africa-card animate-fade-in">
+    <Card className="africa-card animate-fade-in ">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-medium">Upcoming Team Leaves</CardTitle>
       </CardHeader>
@@ -55,19 +59,27 @@ export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
             <p>No upcoming leaves scheduled</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {leaves.map((leave) => (
+          <div className="space-y-3 max-h-[calc(50vh-132px)] overflow-y-auto">
+            {leaves.filter((leave) => {
+    const start = parseISO(leave.startDate);
+    const end = parseISO(leave.endDate);
+    return (
+      isWithinInterval(start, { start: weekStart, end: weekEnd }) ||
+      isWithinInterval(end, { start: weekStart, end: weekEnd }) ||
+      (isBefore(start, weekStart) && isAfter(end, weekEnd)) // spans the whole week
+    );
+  }).map((leave) => (
               <div key={leave.id}>
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8 border border-border">
                     <AvatarImage src={leave.profilePictureUrl} />
                     <AvatarFallback className="bg-africa-sage/10 text-africa-sage text-xs">
-                      {getInitials(leave.name)}
+                      {getInitials(leave.userName)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex justify-between">
-                      <p className="text-sm font-medium">{leave.name}</p>
+                      <p className="text-sm font-medium">{leave.userName}</p>
                       <span className="text-xs bg-africa-cream px-2 py-0.5 rounded-full">
                         {leave.leaveType}
                       </span>

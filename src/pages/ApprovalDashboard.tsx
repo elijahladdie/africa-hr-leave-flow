@@ -4,24 +4,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { getPendingApprovals, updateLeaveRequest } from "@/store/slices/approvalSlice";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  getPendingApprovals,
+  updateLeaveRequest,
+} from "@/store/slices/approvalSlice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchLeaveHistory } from "@/store/slices/leaveHistorySlice";
 
 export default function ApprovalDashboard() {
   const dispatch = useAppDispatch();
-  const { pendingRequests, isLoading, error } = useAppSelector((state) => state.approvals);
+  const { pendingRequests, isLoading, error } = useAppSelector(
+    (state) => state.approvals
+  );
+  const { requests } = useAppSelector((state) => state.leaveHistory);
   const [isProcessing, setIsProcessing] = useState(false);
-
+  const [approvedRequests, setApprovedRequests] = useState([]);
+  const [rejectedRequests, setRejectedRequests] = useState([]);
   useEffect(() => {
     const fetchApprovals = async () => {
       try {
         await dispatch(getPendingApprovals()).unwrap();
+        await dispatch(fetchLeaveHistory()).unwrap();
       } catch (err) {
-        toast.error('Failed to load pending approvals');
-        console.error('Approvals loading error:', err);
+        toast.error("Failed to load pending approvals");
+        console.error("Approvals loading error:", err);
       }
     };
     fetchApprovals();
@@ -31,43 +40,42 @@ export default function ApprovalDashboard() {
     };
   }, [dispatch]);
 
-  // Sample history data
-  const approvedRequests = [
-    {
-      id: "4",
-      employeeName: "Samuel Maina",
-      avatar: undefined,
-      leaveType: "Annual Leave",
-      startDate: "2025-03-15",
-      endDate: "2025-03-20",
-      duration: "6 days",
-      reason: "Family vacation",
-      submittedDate: "2025-03-01",
-    },
-  ];
-  
-  const rejectedRequests = [
-    {
-      id: "5",
-      employeeName: "Aisha Hassan",
-      avatar: undefined,
-      leaveType: "Annual Leave",
-      startDate: "2025-02-10",
-      endDate: "2025-02-15",
-      duration: "6 days",
-      reason: "Short notice application",
-      submittedDate: "2025-02-08",
-    },
-  ];
+  useEffect(() => {
+    if (requests && requests.length > 0) {
+      const approved = requests.filter(
+        (request) => request.status === "APPROVED"
+      );
+      const rejected = requests.filter(
+        (request) => request.status === "REJECTED"
+      );
+      const pending = requests.filter(
+        (request) => request.status === "PENDING"
+      );
 
-  const handleLeaveApproval = async (leaveId: string, status: 'APPROVED' | 'REJECTED', comment?: string) => {
+      setApprovedRequests(approved);
+      setRejectedRequests(rejected);
+    }
+  }, [requests]);
+  if (requests) {
+    // Filter and store them in three variable approvedrequest , Rejected this is how there returned in response PENDING,
+    // APPROVED,
+    // REJECTED,
+  }
+  // Sample history data
+
+
+  const handleLeaveApproval = async (
+    leaveId: string,
+    status: "APPROVED" | "REJECTED",
+    comment?: string
+  ) => {
     setIsProcessing(true);
     try {
       const response = await dispatch(
         updateLeaveRequest({
           leaveId,
           status,
-          comment
+          comment,
         })
       ).unwrap();
       console.log("Leave request updated:", response);
@@ -100,15 +108,17 @@ export default function ApprovalDashboard() {
             <ApprovalCard
               key={approval.id}
               request={approval}
-              onApprove={(id) => handleLeaveApproval(id, 'APPROVED')}
-              onReject={(id) => handleLeaveApproval(id, 'REJECTED')}
+              onApprove={(id) => handleLeaveApproval(id, "APPROVED")}
+              onReject={(id) => handleLeaveApproval(id, "REJECTED")}
             />
           ))}
-          
+
           {pendingRequests.length === 0 && (
             <Card className="col-span-1 lg:col-span-2">
               <CardContent className="py-10 text-center">
-                <p className="text-muted-foreground">No pending leave requests to approve.</p>
+                <p className="text-muted-foreground">
+                  No pending leave requests to approve.
+                </p>
               </CardContent>
             </Card>
           )}
@@ -123,18 +133,21 @@ export default function ApprovalDashboard() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Button variant="ghost" size="sm" asChild className="mb-2 sm:mb-4">
-              <Link to="/" className="flex items-center text-muted-foreground hover:text-foreground">
+              <Link
+                to="/"
+                className="flex items-center text-muted-foreground hover:text-foreground"
+              >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back to Dashboard
               </Link>
             </Button>
-            <h1 className="text-3xl font-bold text-africa-terracotta">Leave Approvals</h1>
-            <p className="text-muted-foreground mt-1">Review and manage team leave requests.</p>
+            <h1 className="text-3xl font-bold text-africa-terracotta">
+              Leave Approvals
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Review and manage team leave requests.
+            </p>
           </div>
-          <Button variant="outline" size="sm" className="mt-4 sm:mt-0 self-start flex items-center">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
@@ -148,16 +161,16 @@ export default function ApprovalDashboard() {
             <TabsTrigger value="approved">Approved</TabsTrigger>
             <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
-          
+
           {renderPendingContent()}
-          
+
           <TabsContent value="approved" className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {approvedRequests.map((approval) => (
                 <Card key={approval.id} className="africa-card animate-fade-in">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-medium">
-                      {approval.employeeName} - {approval.leaveType}
+                      {approval.userName} - {approval.leaveType}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -165,7 +178,8 @@ export default function ApprovalDashboard() {
                       <div>
                         <p className="text-muted-foreground">Period</p>
                         <p className="font-medium">
-                          {new Date(approval.startDate).toLocaleDateString()} - {new Date(approval.endDate).toLocaleDateString()}
+                          {new Date(approval.startDate).toLocaleDateString()} -{" "}
+                          {new Date(approval.endDate).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
@@ -187,24 +201,26 @@ export default function ApprovalDashboard() {
                   </CardContent>
                 </Card>
               ))}
-              
+
               {approvedRequests.length === 0 && (
                 <Card className="col-span-1 lg:col-span-2">
                   <CardContent className="py-10 text-center">
-                    <p className="text-muted-foreground">No approved leave requests found.</p>
+                    <p className="text-muted-foreground">
+                      No approved leave requests found.
+                    </p>
                   </CardContent>
                 </Card>
               )}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="rejected" className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {rejectedRequests.map((approval) => (
                 <Card key={approval.id} className="africa-card animate-fade-in">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-medium">
-                      {approval.employeeName} - {approval.leaveType}
+                      {approval.userName} - {approval.leaveType}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -212,7 +228,8 @@ export default function ApprovalDashboard() {
                       <div>
                         <p className="text-muted-foreground">Period</p>
                         <p className="font-medium">
-                          {new Date(approval.startDate).toLocaleDateString()} - {new Date(approval.endDate).toLocaleDateString()}
+                          {new Date(approval.startDate).toLocaleDateString()} -{" "}
+                          {new Date(approval.endDate).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
@@ -234,11 +251,13 @@ export default function ApprovalDashboard() {
                   </CardContent>
                 </Card>
               ))}
-              
+
               {rejectedRequests.length === 0 && (
                 <Card className="col-span-1 lg:col-span-2">
                   <CardContent className="py-10 text-center">
-                    <p className="text-muted-foreground">No rejected leave requests found.</p>
+                    <p className="text-muted-foreground">
+                      No rejected leave requests found.
+                    </p>
                   </CardContent>
                 </Card>
               )}

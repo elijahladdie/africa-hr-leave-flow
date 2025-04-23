@@ -140,7 +140,7 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
     });
   };
   const handleDayClick = (day) => {
-    console.log("=====> ", day)
+    console.log("=====> ", day);
     if (day.startDate && day.endDate) {
       setSelectedDay(day);
       setIsDialogOpen(true);
@@ -288,56 +288,59 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
                   {selectedDay?.startDate &&
                     format(selectedDay.startDate, "EEEE, MMMM d, yyyy")}
                 </DialogTitle>
-                <DialogClose asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
+             
               </div>
             </DialogHeader>
             <div className="py-4">
               {events.length > 0 ? (
                 <div className="space-y-3">
-                  {events.filter((event) => selectedDay?.startDate >= event?.startDate || selectedDay?.endDate <= event?.endDate).map((event, index) => {
-                    const { bg, text } = leaveTypeColors[event.eventType] || {
-                      bg: "bg-gray-200",
-                      text: "text-gray-700",
-                    };
+                  {events
+                    .filter((event) => {
+                      const eventStart = new Date(event.startDate);
+                      const eventEnd = new Date(event.endDate);
+                      const selectedStart = new Date(selectedDay?.startDate);
+                      const selectedEnd = new Date(selectedDay?.endDate);
 
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-start p-3 rounded-lg border border-border"
-                      >
-                        <Avatar className="h-8 w-8 mr-3">
-                          <AvatarImage src={event?.userAvatar} />
-                          <AvatarFallback className={`${bg} ${text}`}>
-                            {getInitials(event.userName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="font-medium">{event.userName}</div>
-                          <div className={`text-sm ${text} font-medium mt-1`}>
-                            {event.eventType}
+                      return (
+                        eventStart <= selectedEnd && eventEnd >= selectedStart
+                      );
+                    })
+                    .map((event, index) => {
+                      const { bg, text } = leaveTypeColors[event.eventType] || {
+                        bg: "bg-gray-200",
+                        text: "text-gray-700",
+                      };
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-start p-3 rounded-lg border border-border"
+                        >
+                          <Avatar className="h-8 w-8 mr-3">
+                            <AvatarImage src={event?.userAvatar} />
+                            <AvatarFallback className={`${bg} ${text}`}>
+                              {getInitials(event.userName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="font-medium">{event.userName}</div>
+                            <div className={`text-sm ${text} font-medium mt-1`}>
+                              {event.eventType}
+                            </div>
+                            {event.description && (
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {event.description}
+                              </div>
+                            )}
+                            {event.startDate && event.endDate && (
+                              <div className="text-xs text-muted-foreground mt-2">
+                                {event.startDate} - {event.endDate}
+                              </div>
+                            )}
                           </div>
-                          {event.description && (
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {event.description}
-                            </div>
-                          )}
-                          {event.startDate && event.endDate && (
-                            <div className="text-xs text-muted-foreground mt-2">
-                              {event.startDate} - {event.endDate}
-                            </div>
-                          )}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">

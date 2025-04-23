@@ -59,8 +59,8 @@ export const getAllUsers = createAsyncThunk(
     'users/getAll',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await HttpRequest.get<User[]>(`${BASE_URL}/api/users`);
-            return response;
+            const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/users`);
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(error.message);
         }
@@ -72,7 +72,7 @@ export const updateUserRole = createAsyncThunk(
     async (data: UserRoleUpdateDTO, { rejectWithValue }) => {
         try {
             const response = await HttpRequest.put<User>(
-                `${BASE_URL}/api/users/${data.userId}/role`,
+                `${BASE_URL}/api/users/${data.userId}`,
                 { role: data.role }
             );
             return response;
@@ -113,6 +113,7 @@ const userSlice = createSlice({
             })
             .addCase(getAllUsers.fulfilled, (state, action) => {
                 state.isLoading = false;
+                console.log(action.payload, "======>/<")
                 state.users = action.payload;
             })
             .addCase(getAllUsers.rejected, (state, action) => {

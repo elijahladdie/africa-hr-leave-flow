@@ -1,4 +1,3 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -12,6 +11,7 @@ interface UserProfileProps {
   manager: string;
   avatarUrl?: string;
   joinDate: string;
+  isLinkHidden?: boolean; // Optional prop to hide the link
 }
 
 export function UserProfile({
@@ -21,9 +21,11 @@ export function UserProfile({
   manager,
   avatarUrl,
   joinDate,
+  isLinkHidden = false,
 }: UserProfileProps) {
   // Get initials from name
-  const initials = name?.split(" ")
+  const initials = name
+    ?.split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase();
@@ -60,7 +62,7 @@ export function UserProfile({
             <span className="text-muted-foreground">Join Date:</span>
             <span className="font-medium">{joinDate}</span>
           </div>
-          <div className="pt-3">
+          <div className={`pt-3 ${isLinkHidden ? "hidden" : ""}`}>
             <Link
               to="/profile"
               className="text-sm text-africa-blue hover:text-africa-blue/80 flex items-center transition-colors"

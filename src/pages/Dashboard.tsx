@@ -7,46 +7,24 @@ import { toast } from "sonner";
 import { RootState, useAppDispatch, useAppSelector } from "@/store";
 import { useAuth } from "@/contexts/auth-context";
 import { getTeamActiveRequests } from "@/store/slices/leaveSlice";
+import { fetchLeaveHistory } from "@/store/slices/leaveHistorySlice";
 
 export default function Dashboard() {
   // Sample leave balance data with more realistic values
 
   // Sample team leave data with African holidays and events
-  const teamLeaves = [
-    {
-      id: "1",
-      name: "Amina Hassan",
-      avatar: undefined,
-      startDate: "2025-04-22",
-      endDate: "2025-04-25",
-      leaveType: "Annual Leave",
-    },
-    {
-      id: "2",
-      name: "John Okafor",
-      avatar: undefined,
-      startDate: "2025-04-29",
-      endDate: "2025-05-02",
-      leaveType: "Study Leave",
-    },
-    {
-      id: "3",
-      name: "Fatima Mohammed",
-      avatar: undefined,
-      startDate: "2025-05-06",
-      endDate: "2025-05-13",
-      leaveType: "Annual Leave",
-    },
-  ];
 
   const { user: calledfromAuth } = useAuth();
   const dispatch = useAppDispatch();
+    const { requests } = useAppSelector((state) => state.leaveHistory);
+  
   const { user } = useAppSelector((state) => state.user);
   const [leaveBalances, setLeaveBalances] = useState([]);
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         await dispatch(getUserProfile()).unwrap();
+        await dispatch(fetchLeaveHistory()).unwrap();
         if (calledfromAuth?.teams && calledfromAuth?.teams?.length !== 0) {
           console.log(calledfromAuth?.teams?.[0]?.id, "team id");
           dispatch(getTeamActiveRequests(calledfromAuth?.teams?.[0]?.id)).unwrap();
@@ -84,10 +62,10 @@ export default function Dashboard() {
                     ? user?.teams?.[0]?.department?.name
                     : "N/A"
                 }
-                manager="Sarah Johnson"
+                manager={user?.teams?.[0]?.managerName}
                 joinDate={new Date(user?.createdAt).toLocaleDateString()}
               />
-              <UpcomingLeaves leaves={teamLeaves} />
+              <UpcomingLeaves leaves={requests} />
             </div>
             {/* Leave balance cards in a responsive 2-column grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">

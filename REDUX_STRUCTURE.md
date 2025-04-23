@@ -11,7 +11,7 @@ src/
 │   └── slices/              # Redux slices
 │       ├── authSlice.ts     # Authentication slice
 │       ├── usersSlice.ts    # Users slice
-│       └── tasksSlice.ts    # Tasks slice
+│      
 ├── providers/               # React context providers
 │   └── StoreProvider.tsx    # Redux store provider component
 ├── components/              # React components using Redux

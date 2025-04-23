@@ -41,15 +41,11 @@ interface UserUpdateData {
 }
 
 // Async thunks for API operations
-export const fetchUsers = createAsyncThunk<
-  ResponseData,
-  PaginationParams,
-  { rejectValue: string }
->('users/fetchUsers', async (params, { rejectWithValue }) => {
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejectWithValue }) => {
   try {
     // Replace with actual API call
     const response = await HttpRequest.get<ResponseData>(
-      `${BASE_URL}/api/users?page=${params.page}&limit=${params.limit}`,
+      `${BASE_URL}/api/users`,
     );
 
     if (!response.data) {
@@ -58,7 +54,7 @@ export const fetchUsers = createAsyncThunk<
     }
 
 
-    return response;
+    return response.data;
   } catch (error) {
     return rejectWithValue('Network error occurred');
   }
@@ -96,21 +92,17 @@ export const updateUser = createAsyncThunk<
 >('users/updateUser', async ({ userId, userData }, { rejectWithValue }) => {
   try {
     // Replace with actual API call
-    const response = await fetch(`/api/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
+    const response = await HttpRequest.put<ResponseData>(`${BASE_URL}/api/users/${userId}`, {
+      userData,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return rejectWithValue(errorData.message || 'Failed to update user');
+    if (!response.data) {
+      const errorData = await response.resp_msg;
+      return rejectWithValue(errorData || 'Failed to update user');
     }
 
-    const data = await response.json();
-    return data.user;
+
+    return response.data;
   } catch (error) {
     return rejectWithValue('Network error occurred');
   }
@@ -144,7 +136,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || 'Failed to fetch users';
+        state.error = action.payload as string || 'Failed to fetch users';
       });
 
     // Fetch user by ID cases

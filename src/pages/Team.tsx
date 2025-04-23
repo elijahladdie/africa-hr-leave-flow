@@ -9,31 +9,12 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector, type RootState } from "@/store";
 import {
   createTeamMember,
-  deleteTeamMember,
   getAllTeamMembers,
 } from "@/store/slices/teamMemberSlice";
-import { TeamMemberDTO } from "@/types/dto";
-import { formatDistance } from "date-fns";
+import { TeamDTO, TeamMemberDTO } from "@/types/dto";
 import { createTeam, getAllTeams } from "@/store/slices/teamSlice";
 import { useForm } from "react-hook-form";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "recharts";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { getAllDepartments } from "@/store/slices/departmentSlice";
 import AddTeamMemberForm from "@/components/team/add-team-member-dialog";
 import CreateTeamForm from "@/components/team/create-team-dialog";
@@ -49,19 +30,10 @@ export default function Team() {
   const teamMembers = useSelector(
     (state: RootState) => state.teamMembers.teamMembers
   );
-  const error = useSelector((state: RootState) => state.teams.error);
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm();
-  console.log(users, ">>>>>>>>");
+
   useEffect(() => {
     const fetchTeamData = async () => {
       try {
-        setIsLoading(true);
         const params = { page: 1, limit: 30 };
         await dispatch(getAllTeamMembers()).unwrap();
         await dispatch(getAllDepartments()).unwrap();
@@ -69,9 +41,7 @@ export default function Team() {
         await dispatch(fetchUsers(params)).unwrap();
       } catch (err) {
         toast.error(err.resp_msg || "Failed to load team members");
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     };
 
     fetchTeamData();
@@ -92,79 +62,33 @@ export default function Team() {
       .toUpperCase();
   };
 
-  const onSubmit = async (memberData: TeamMemberDTO) => {
-    setIsLoading(true);
+  const onSubmit = async (memberData: TeamMemberDTO) => {};
+
+  // Handle creating a team
+  const handleCreateTeam = async (data: TeamDTO) => {
+    console.log(data, ">>>>>>><<<<<<");
+    dispatch(createTeam(data));
+    // Also create team members
+  
+  };
+
+  // Handle adding a team member
+  const handleAddMember = async (memberData: TeamMemberDTO) => {
+
+    
     try {
-      const response = await dispatch(
+       await dispatch(
         createTeamMember({
           ...memberData,
           joinedAt: new Date().toISOString(),
         })
       ).unwrap();
-      console.log("New team member added:", response);
       toast.success("Team member added successfully");
     } catch (err) {
-      toast.error("Failed to add team member");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      console.log(err,  "======")
+      toast.error(err.resp_msg || "Failed to add team member");
+    } 
 
-  // Handle creating a team
-  const handleCreateTeam = (data) => {
-    console.log(data, ">>>>>>><<<<<<");
-    const newTeam = {
-      id: `team-${Date.now()}`,
-      name: data.name,
-      description: data.description,
-      departmentId: data.departmentId,
-      managerId: data.managerId,
-    };
-
-    // Also create team members
-    if (data.teamMemberIds && data.teamMemberIds.length > 0) {
-      const newMembers = data.teamMemberIds.map((userId) => {
-        const user = users.find((u) => u.id === userId);
-        const department = departments.find((d) => d.id === data.departmentId);
-
-        return {
-          id: `member-${Date.now()}-${userId}`,
-          name: user.fullName,
-          role: "Team Member",
-          user: { email: user.email },
-          team: {
-            name: data.name,
-            department: { name: department?.name || "Unknown" },
-          },
-          profilePictureUrl: "",
-          joinedAt: new Date(),
-        };
-      });
-
-      // setTeamMembers([...teamMembers, ...newMembers]);
-    }
-  };
-
-  // Handle adding a team member
-  const handleAddMember = (data) => {
-    const user = users.find((u) => u.id === data.userId);
-    const team = teams.find((t) => t.id === data.teamId);
-    const department = departments.find((d) => d.id === team.departmentId);
-
-    const newMember = {
-      id: `member-${Date.now()}`,
-      name: user.name,
-      role: data.role,
-      user: { email: user.email },
-      team: {
-        name: team.name,
-        department: { name: department?.name || "Unknown" },
-      },
-      profilePictureUrl: "",
-      joinedAt: new Date(),
-    };
-
-    // setTeamMembers([...teamMembers, newMember]);
   };
   console.log("Team members:", teamMembers);
 
@@ -194,7 +118,6 @@ export default function Team() {
             <Users className="h-5 w-5 mr-2 text-africa-terracotta" />
             <h2 className="text-xl font-medium">Team Members</h2>
           </div>
-          {/* <div className="flex items-center space-x-8"> */}
           <AddTeamMemberForm
             teams={teams}
             availableUsers={users}
@@ -234,20 +157,19 @@ export default function Team() {
                   <div>
                     <dt className="text-muted-foreground inline">
                       Department:
-                    </dt>{" "}
+                    </dt>
                     <dd className="inline font-medium">
                       {member.team?.department?.name}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground inline">Email:</dt>{" "}
+                    <dt className="text-muted-foreground inline">Email: </dt>
                     <dd className="inline font-medium">{member.user?.email}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground inline">Join Date:</dt>{" "}
+                    <dt className="text-muted-foreground inline">Join Date: </dt>
                     <dd className="inline font-medium">
                       {new Date(member.joinedAt).toLocaleDateString()}
-                      {/* {formatDistance(member?.joinedAt , )} */}
                     </dd>
                   </div>
                 </dl>

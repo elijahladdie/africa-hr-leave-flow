@@ -14,11 +14,7 @@ export function TeamCard({ team }: TeamCardProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">{team.name}</CardTitle>
-        {/* <EditTeamDialog team={team}>
-          <Button variant="ghost" size="icon">
-            <Edit2 className="h-4 w-4" />
-          </Button>
-        </EditTeamDialog> */}
+    
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
