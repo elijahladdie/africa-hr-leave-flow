@@ -19,44 +19,13 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/auth-context";
-import { getAllTeamMembers } from "@/store/slices/teamMemberSlice";
+
 import { getTeamsByDepartment } from "@/store/slices/teamSlice";
 import { toast } from "sonner";
-import { useAppDispatch } from "@/store";
-
-// Mock leave types with their color coding
-const leaveTypes = [
-  { name: "Annual Leave", color: "bg-blue-100 text-blue-800 border-blue-300" },
-  { name: "Sick Leave", color: "bg-red-100 text-red-800 border-red-300" },
-  {
-    name: "Study Leave",
-    color: "bg-purple-100 text-purple-800 border-purple-300",
-  },
-  {
-    name: "Maternity Leave",
-    color: "bg-pink-100 text-pink-800 border-pink-300",
-  },
-  {
-    name: "Compassionate",
-    color: "bg-amber-100 text-amber-800 border-amber-300",
-  },
-  {
-    name: "Public Holiday",
-    color: "bg-green-100 text-green-800 border-green-300",
-  },
-];
-
-// Mock departments
-const departments = [
-  "All Departments",
-  "Engineering",
-  "HR",
-  "Finance",
-  "Marketing",
-  "Operations",
-  "Leadership",
-];
+import { RootState, useAppDispatch, useAppSelector } from "@/store";
+import { getAllTeamCalendarEvents } from "@/store/slices/teamCalendarSlice";
+import { getLeaveTypes } from "@/store/slices/leaveSlice";
+import { getAllDepartments } from "@/store/slices/departmentSlice";
 
 // Mock upcoming holidays
 const publicHolidays = [
@@ -66,56 +35,52 @@ const publicHolidays = [
   { date: "2025-07-01", name: "Republic Day", country: "Ghana" },
   { date: "2025-09-24", name: "Heritage Day", country: "South Africa" },
 ];
-
-// Mock team members on leave today
-const onLeaveToday = [
-  {
-    name: "Amina Said",
-    department: "HR",
-    leaveType: "Annual Leave",
-    returnDate: "2025-04-22",
-  },
-  {
-    name: "David Osei",
-    department: "Engineering",
-    leaveType: "Sick Leave",
-    returnDate: "2025-04-20",
-  },
-];
+const leaveTypeColors: Record<string, string> = {
+  ANNUAL: "bg-blue-100 text-blue-800 border-blue-300",
+  SICK: "bg-red-100 text-red-800 border-red-300",
+  MATERNITY: "bg-pink-100 text-pink-800 border-pink-300",
+  PATERNITY: "bg-indigo-100 text-indigo-800 border-indigo-300",
+  OTHER: "bg-amber-100 text-amber-800 border-amber-300",
+  UNPAID: "bg-gray-100 text-gray-800 border-gray-300",
+};
 
 export default function TeamCalendarPage() {
-  const { user } = useAuth();
-  const dispatch = useAppDispatch()
+  const { events, isLoading, error } = useAppSelector(
+    (state: RootState) => state.teamCalendar
+  );
+  const { leaveTypes } = useAppSelector((state: RootState) => state.leave);
+  const dispatch = useAppDispatch();
   const [selectedDepartment, setSelectedDepartment] =
     useState("All Departments");
   const [selectedView, setSelectedView] = useState("calendar");
-  const [isLoading, setIsLoading] = useState(true);
+  const [onLeaveToday, setOnLeaveToday] = useState([]);
+  const departments = useAppSelector(
+    (state: RootState) => state.departments.departments
+  );
 
-  // Simulate data loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+    const handleTeamSchedule = async () => {
+      await dispatch(getLeaveTypes()).unwrap();
+      await dispatch(getAllTeamCalendarEvents()).unwrap;
+      await dispatch(getAllDepartments()).unwrap();
+    };
+    handleTeamSchedule();
+
+    if (events.length === 0) {
+      setOnLeaveToday([]);
+      return;
+    }
+
+    const today = new Date().toISOString().split("T")[0]; // Format: "YYYY-MM-DD"
+
+    const onLeaveToday = events.filter((event) => {
+      const start = new Date(event.startDate).toISOString().split("T")[0];
+      const end = new Date(event.endDate).toISOString().split("T")[0];
+      return start === today || end === today || (start < today && end > today);
+    });
+
+    setOnLeaveToday(onLeaveToday);
   }, []);
-
-  const handleDepartmentChange = async (departmentId: string) => {
-    try {
-      const response = await dispatch(getTeamsByDepartment(departmentId)).unwrap();
-      console.log("Teams by department:", response);
-    } catch (err) {
-      toast.error("Failed to fetch teams");
-    }
-  };
-
-  const handleTeamSchedule = async () => {
-    try {
-      const response = await dispatch(getAllTeamMembers()).unwrap();
-      console.log("Team members schedule:", response);
-    } catch (err) {
-      toast.error("Failed to fetch team schedule");
-    }
-  };
 
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-8 bg-background">
@@ -150,8 +115,8 @@ export default function TeamCalendarPage() {
               </SelectTrigger>
               <SelectContent>
                 {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -186,28 +151,6 @@ export default function TeamCalendarPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            {/* /**
-          <TabsContent value="calendar" className="mt-0">
-              <div className="bg-white rounded-lg border shadow-sm">
-                <TeamCalendar className="w-full p-2" />
-              </div>
-            </TabsContent>
-            <TabsContent value="list" className="mt-0">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Team Leave Schedule</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">Coming soon: List view of all team leave schedules with sorting and filtering options.</p>
-                    <Button onClick={() => setSelectedView("calendar")}>
-                      Switch to Calendar View
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent> */}
-
             <Tabs
               defaultValue="calendar"
               value={selectedView}
@@ -259,7 +202,10 @@ export default function TeamCalendarPage() {
                     <Badge
                       key={type.name}
                       variant="outline"
-                      className={`${type.color}`}
+                      className={
+                        leaveTypeColors[type.leaveType] ||
+                        "bg-slate-100 text-slate-800 border-slate-300"
+                      }
                     >
                       {type.name}
                     </Badge>
@@ -310,21 +256,21 @@ export default function TeamCalendarPage() {
                 {onLeaveToday.length > 0 ? (
                   <div className="divide-y">
                     {onLeaveToday.map((member) => (
-                      <div key={member.name} className="px-4 py-3">
-                        <p className="text-sm font-medium">{member.name}</p>
+                      <div key={member.id} className="px-4 py-3">
+                        <p className="text-sm font-medium">{member.userName}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {member.department}
+                          {member.teamName}
                         </p>
                         <div className="flex justify-between mt-1">
                           <Badge
                             variant="outline"
                             className="text-xs bg-blue-100 text-blue-800 border-blue-300"
                           >
-                            {member.leaveType}
+                            {member.eventType}
                           </Badge>
                           <p className="text-xs text-muted-foreground">
                             Returns:{" "}
-                            {new Date(member.returnDate).toLocaleDateString(
+                            {new Date(member.endDate).toLocaleDateString(
                               "en-US",
                               { month: "short", day: "numeric" }
                             )}

@@ -31,4 +31,13 @@ export interface LeaveRequestDTO {
   halfDay: boolean;
   reason: string;
   submittedAt: string;
+} 
+export interface LeaveType {
+  id: string;
+  name: string;
+  leaveType: string;
+  description: string;
+  maxDays: number;
+  createdAt: string;
+  updatedAt: string;
 }

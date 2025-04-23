@@ -113,7 +113,7 @@ const AuthCallback: React.FC = () => {
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-africa-terracotta text-white mb-4">
-              <span className="font-bold text-xl">IST</span>
+              <span className="font-bold text-xl">LV</span>
             </div>
           </div>
           <h1 className="text-3xl font-semibold text-africa-dark">

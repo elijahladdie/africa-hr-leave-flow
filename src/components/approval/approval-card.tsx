@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { CheckCircle, Clock, File, HelpCircle, XCircle } from "lucide-react";
 import { useState } from "react";
-import { LeaveApproval } from '@/types/approval';
+import { LeaveApproval } from "@/types/approval";
 
 interface ApprovalCardProps {
   request: LeaveApproval;
@@ -24,14 +24,20 @@ interface ApprovalCardProps {
   onReject: (id: string) => void;
 }
 
-export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps) {
+export function ApprovalCard({
+  request,
+  onApprove,
+  onReject,
+}: ApprovalCardProps) {
   const [comment, setComment] = useState("");
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
+  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
+    null
+  );
 
   // Get initials for avatar
   const getInitials = (name: string) => {
-    if(!name) return "N/A";
+    if (!name) return "N/A";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -43,7 +49,7 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
   };
 
@@ -55,9 +61,20 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
 
   // Handle submit
   const handleSubmit = () => {
-    console.log("Action:", actionType, "Request ID:", request.id, "Comment:", comment);
-    // Here you would submit to your API
-    alert(`Request ${actionType === "approve" ? "approved" : "rejected"} successfully!`);
+    console.log(
+      "Action:",
+      actionType,
+      "Request ID:",
+      request.id,
+      "Comment:",
+      comment
+    );
+    if (actionType === "approve") {
+      onApprove(request.id);
+    } else {
+      onReject(request.id);
+    }
+
     setComment("");
     setShowCommentBox(false);
     setActionType(null);
@@ -69,7 +86,7 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
         <div className="flex justify-between">
           <div className="flex items-center space-x-3">
             <Avatar>
-              <AvatarImage src={request.avatar} />
+              <AvatarImage src={request.profilePictureUrl} />
               <AvatarFallback className="bg-africa-blue/10 text-africa-blue">
                 {getInitials(request.userName)}
               </AvatarFallback>
@@ -78,12 +95,16 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
               <CardTitle className="text-base font-medium">
                 {request.userName}
               </CardTitle>
-              <p className="text-sm text-muted-foreground">{request.leaveType}</p>
+              <p className="text-sm text-muted-foreground">
+                {request.leaveType}
+              </p>
             </div>
           </div>
           <div className="flex items-center text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5 mr-1" />
-            <span>Submitted: {new Date(request.createdAt).toLocaleDateString()}</span>
+            <span>
+              Submitted: {new Date(request.createdAt).toLocaleDateString()}
+            </span>
           </div>
         </div>
       </CardHeader>
@@ -92,21 +113,23 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Period</p>
-              <p className="font-medium">{formatDateRange(request.startDate, request.endDate)}</p>
+              <p className="font-medium">
+                {formatDateRange(request.startDate, request.endDate)}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground">Duration</p>
               <p className="font-medium">{request.duration}</p>
             </div>
           </div>
-          
+
           {request.reason && (
             <div className="text-sm">
               <p className="text-muted-foreground">Reason</p>
               <p className="font-medium">{request.reason}</p>
             </div>
           )}
-          
+
           {request?.documentUrl && (
             <div>
               <Button
@@ -119,7 +142,7 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
               </Button>
             </div>
           )}
-          
+
           {showCommentBox && (
             <div className="space-y-2">
               <div className="flex items-center gap-1">
@@ -131,8 +154,8 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-xs max-w-xs">
-                        {actionType === "approve" 
-                          ? "Add any notes about this approval." 
+                        {actionType === "approve"
+                          ? "Add any notes about this approval."
                           : "Please provide a reason for rejection."}
                       </p>
                     </TooltipContent>
@@ -166,18 +189,20 @@ export function ApprovalCard({ request, onApprove, onReject }: ApprovalCardProps
             >
               Cancel
             </Button>
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               size="sm"
               onClick={handleSubmit}
               disabled={actionType === "reject" && !comment}
               className={
-                actionType === "approve" 
-                  ? "bg-africa-sage hover:bg-africa-sage/90" 
+                actionType === "approve"
+                  ? "bg-africa-sage hover:bg-africa-sage/90"
                   : "bg-africa-red hover:bg-africa-red/90"
               }
             >
-              {actionType === "approve" ? "Confirm Approval" : "Confirm Rejection"}
+              {actionType === "approve"
+                ? "Confirm Approval"
+                : "Confirm Rejection"}
             </Button>
           </>
         ) : (

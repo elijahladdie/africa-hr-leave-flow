@@ -11,7 +11,7 @@ const roleBasedRoutes: {
   allowedRoles: string[];
 }[] = [
   { path: "/", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
-  { path: "/my-requests", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
+  { path: "/my-requests", allowedRoles: ["STAFF", "MANAGER"] },
   { path: "/team-calendar", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
   { path: "/apply", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },
   { path: "/profile-setup", allowedRoles: ["STAFF", "MANAGER", "ADMIN"] },

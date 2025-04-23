@@ -24,7 +24,7 @@ export default function UserProfilePage() {
         role={mockUser.role}
         department={mockUser.department}
         manager={mockUser.manager}
-        avatarUrl={mockUser.avatarUrl}
+        avatarUrl={mockUser.profilePictureUrlUrl}
         joinDate={mockUser.joinDate}
       />
 

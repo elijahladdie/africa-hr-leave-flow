@@ -1,17 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { UserRoleUpdateDTO } from '@/types/admin';
 import HttpRequest from '@/lib/HttpRequest';
-import { User } from '@/types';
+import { ResponseData, User } from '@/types';
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
 
 interface UserState {
+    user: User;
     users: User[];
     isLoading: boolean;
     error: string | null;
 }
 
 const initialState: UserState = {
+    user: null,
     users: [],
     isLoading: false,
     error: null,
@@ -21,8 +23,8 @@ export const getUserProfile = createAsyncThunk(
     'users/getProfile',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await HttpRequest.get<User>(`${BASE_URL}/api/users/profile`);
-            return response;
+            const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/users/profile`);
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(error.message);
         }
@@ -92,20 +94,18 @@ const userSlice = createSlice({
             })
             .addCase(getUserProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.users = [action.payload];
+                state.user = action.payload;
             })
             .addCase(getUserProfile.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
             })
             .addCase(updateUserProfile.fulfilled, (state, action) => {
-                const index = state.users.findIndex(user => user.id === action.payload.id);
-                if (index !== -1) {
-                    state.users[index] = action.payload;
-                }
+                state.isLoading = false;
+                state.user = action.payload;
             })
             .addCase(deactivateUser.fulfilled, (state, action) => {
-                state.users = state.users.filter(user => user.id !== action.payload);
+                state.user = state.user?.id === action.payload ? null : state.user;
             })
             .addCase(getAllUsers.pending, (state) => {
                 state.isLoading = true;

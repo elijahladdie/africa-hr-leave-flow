@@ -37,8 +37,9 @@ export const updateLeaveRequest = createAsyncThunk(
   async (payload: UpdateLeaveRequestPayload, { rejectWithValue }) => {
     try {
       const response = await HttpRequest.put<ResponseData>(
-        `${BASE_URL}/api/leave-requests/${payload.leaveId}`,
-        { status: payload.status, comments: payload.comment }
+        `${BASE_URL}/api/leave-requests/${payload.leaveId}/status`,
+        {},
+        { params: { status: payload.status, reason: payload.comment } }
       );
       return response;
     } catch (error) {

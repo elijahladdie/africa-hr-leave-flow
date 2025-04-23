@@ -54,8 +54,8 @@ export const createDepartment = createAsyncThunk(
         try {
             const response = await HttpRequest.post<ResponseData>(`${BASE_URL}/api/departments`, data);
             return response;
-        } catch (error: any) {
-            return rejectWithValue(error.message);
+        } catch (error) {
+            return rejectWithValue(error.response);
         }
     }
 );
@@ -66,8 +66,8 @@ export const updateDepartment = createAsyncThunk(
         try {
             const response = await HttpRequest.put<ResponseData>(`${BASE_URL}/api/departments/${id}`, data);
             return response;
-        } catch (error: any) {
-            return rejectWithValue(error.message);
+        } catch (error) {
+            return rejectWithValue(error.response);
         }
     }
 );
@@ -78,7 +78,7 @@ export const deleteDepartment = createAsyncThunk(
         try {
             const response = await HttpRequest.delete<ResponseData>(`${BASE_URL}/api/departments/${id}`);
             return response;
-        } catch (error: any) {
+        } catch (error) {
             return rejectWithValue(error.message);
         }
     }
@@ -103,7 +103,6 @@ const departmentSlice = createSlice({
                 state.error = action.payload as string;
             })
         // Add other cases for remaining actions
-        // ...
     },
 });
 
