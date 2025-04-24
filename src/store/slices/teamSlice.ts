@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import HttpRequest from '@/lib/HttpRequest';
 import { TeamDTO } from '@/types/dto';
+import { ResponseData } from '@/types';
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
 
@@ -50,7 +51,8 @@ export const createTeam = createAsyncThunk(
   'teams/create',
   async (data: TeamDTO, { rejectWithValue }) => {
     try {
-      const response = await HttpRequest.post<TeamDTO>(`${BASE_URL}/api/teams`, data);
+      const response = await HttpRequest.post<ResponseData>(`${BASE_URL}/api/teams`, data);
+
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -140,8 +142,8 @@ const teamSlice = createSlice({
       })
       // Create team
       .addCase(createTeam.fulfilled, (state, action) => {
-        state.teams.push(action.payload);
-        state.currentTeam = action.payload;
+        state.teams.push(action.payload.data);
+        state.currentTeam = action.payload.data;
       })
       // Update team
       .addCase(updateTeam.fulfilled, (state, action) => {

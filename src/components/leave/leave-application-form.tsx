@@ -85,7 +85,6 @@ export function LeaveApplicationForm() {
   const { leaveTypes } = useAppSelector((state) => state.leave);
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  console.log("Leave types from Redux:", leaveTypes);
   // Initialize the form
   const form = useForm<LeaveFormValues>({
     resolver: zodResolver(formSchema),
@@ -136,9 +135,7 @@ export function LeaveApplicationForm() {
           data.documentUpload instanceof File ? data.documentUpload : undefined,
       };
 
-      const response = await dispatch(submitLeaveRequest(payload)).unwrap();
-
-      console.log("Leave request submitted:", response);
+      await dispatch(submitLeaveRequest(payload)).unwrap();
       toast.success("Leave request submitted successfully");
       navigate("/my-requests");
     } catch (err) {

@@ -60,7 +60,7 @@ export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
           </div>
         ) : (
           <div className="space-y-3 max-h-[calc(50vh-132px)] overflow-y-auto">
-            {leaves.filter((leave) => {
+            {leaves?.filter((leave) => {
     const start = parseISO(leave.startDate);
     const end = parseISO(leave.endDate);
     return (

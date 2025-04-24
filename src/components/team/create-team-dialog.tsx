@@ -1,4 +1,3 @@
-// CreateTeamForm.jsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Plus, Users } from "lucide-react";
@@ -106,7 +105,7 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
                 <SelectValue placeholder="Select Manager" />
               </SelectTrigger>
               <SelectContent>
-                {users.filter((user) => user.role === 'MANAGER').map((user) => (
+                {users?.filter((user) => user.role === 'MANAGER').map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.fullName}
                   </SelectItem>
@@ -118,7 +117,7 @@ const CreateTeamForm = ({ departments, users, onCreateTeam }) => {
           <div className="space-y-2">
             <Label>Team Members</Label>
             <div className="border rounded-md p-2 max-h-40 overflow-y-auto">
-              {users.filter((user) => user.role === 'STAFF').map((user) => (
+              {users?.filter((user) => user.role === 'STAFF').map((user) => (
                 <div key={user.id} className="flex items-center space-x-2 p-1">
                   <input
                     type="checkbox"

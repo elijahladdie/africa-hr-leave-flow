@@ -4,6 +4,7 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
+import { getData } from "@/lib/authUtils";
 
 // Define which routes are accessible to which roles
 const roleBasedRoutes: {
@@ -25,13 +26,12 @@ export const ProtectedRoute = () => {
   const { isAuthenticated, user } = useAuth();
   const { isCollapsed } = useSidebar();
   const location = useLocation();
-  console.log(user, "user in protected route");
+  const userdata = getData();
   // Check if the user is authenticated
 
-  if (!isAuthenticated && !user) {
+  if (!isAuthenticated && !user && !userdata) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
-  
 
   if (user?.role && location.pathname !== "/profile-setup") {
     const currentRoute = roleBasedRoutes.find(

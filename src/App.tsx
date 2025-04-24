@@ -29,6 +29,7 @@ import ExternalLoginFailure from "./components/auth/profile-setup";
 import { StoreProvider } from "./providers/StoreProvider";
 import store from "./store";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { getData } from "./lib/authUtils";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -39,7 +40,8 @@ const AuthController = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-
+  const userdata = getData();
+  
   useEffect(() => {
     if (
       ((isAuthenticated || user) && location.pathname === "/login") ||
@@ -47,35 +49,23 @@ const AuthController = ({ children }: { children: React.ReactNode }) => {
     ) {
       if (from !== "/login") {
         navigate(from, { replace: true });
-      }else{
-        navigate("/");
+      } else {
+       window.location.reload()
       }
 
       return;
     }
 
-    // If user is not authenticated and not on login page, redirect to login
-    // if (!isAuthenticated && location.pathname == '/login') {
-    //   navigate('/');
-    //   return;
-    // }
-
-    // If the user is authenticated but hasn't completed profile setup
-    // and isn't already on the profile setup page
-    // if (isAuthenticated &&
-    //     user &&
-    //     !user.hasCompletedProfile &&
-    //     location.pathname !== '/profile-setup' &&
-    //     location.pathname !== '/login') {
-    //   navigate('/profile-setup');
-    //   return;
-    // }
-
+ 
     // If authenticated and on login page, redirect to home
-    // if (isAuthenticated && location.pathname === '/login') {
-    //   navigate('/');
-    //   return;
-    // }
+    if (
+      user &&
+      (location.pathname === "/auth/callback" ||
+        location.pathname === "/login")
+    ) {
+      navigate("/");
+      return;
+    }
   }, [isAuthenticated, user, navigate, location.pathname]);
 
   return <>{children}</>;

@@ -9,8 +9,6 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 
-
-
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
@@ -26,7 +24,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(() => getData());
-  // Initialize auth state from localStorage on mount
   useEffect(() => {
     const storedUser = getData();
     if (storedUser) {
@@ -67,8 +64,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setIsAuthenticated(true);
 
     // Show success message
-    toast.success("Login successful! ===><", {
-      description: "Welcome to LV Africa Leave Management System",
+    toast.success("Login successful!", {
+      description: "Welcome to IST Africa Leave Management System",
     });
 
     return true;
@@ -97,6 +94,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setUser(null);
     deleteToken();
     toast.info("You have been logged out");
+    window.location.reload();
   };
 
   return (

@@ -1,9 +1,5 @@
-import {
-  fetchMicrosoftLoginSuccess,
-  selectUser,
-  updateUserByMemId,
-} from "@/store/slices/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { selectUser, updateUserByMemId } from "@/store/slices/authSlice";
+import { useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -26,16 +22,19 @@ import { Progress } from "@/components/ui/progress";
 import { CircleCheck, CircleUser } from "lucide-react";
 import { RootState, useAppDispatch, useAppSelector } from "@/store";
 import { toast } from "sonner";
-import { setData, setToken } from "@/lib/authUtils";
 import { getAllDepartments } from "@/store/slices/departmentSlice";
-
-// const teams = ["Engineering", "Product", "Design", "Operations"];
+import { setData, setToken } from "@/lib/authUtils";
+import {
+  getUserProfile,
+  setUserFromEncodedData,
+} from "@/store/slices/userSlice";
+import { User } from "@/types";
 
 const AuthCallback: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
-  const user = useSelector(selectUser);
+  const user = useAppSelector(selectUser);
   const departments = useAppSelector(
     (state: RootState) => state.departments.departments
   );
@@ -43,43 +42,65 @@ const AuthCallback: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
-  const disableRedirect = urlParams.get("disableRedirect");
+  const [userData, setUserData] = useState<User>();
+  const encodedData = urlParams.get("data");
+  const errorData = urlParams.get("error");
 
+  useEffect(() => {
+    if (encodedData) {
+      try {
+        const decoded = atob(encodedData);
+        const user = JSON.parse(decoded);
+        setUserData(user);
+        dispatch(setUserFromEncodedData(user));
+        setData(user);
+      } catch (error) {
+        console.error("Failed to decode user data:", error);
+      }
+    } else {
+      if (user) {
+        setUserData(user);
+      }
+      if (errorData) {
+        toast.error(
+          "Oops! We had problem validating you identification please try again"
+        );
+        navigate("/login");
+      }
+    }
+  }, [encodedData]);
   const isFormValid = selectedDepart !== "";
-  console.log("User from Redux:", user.teams.length);
-  console.log(token && disableRedirect == "true" && user?.teams?.length === 0);
+
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // const response = await dispatch(
-      //   fetchMicrosoftLoginSuccess(token)
-      // ).unwrap();
-
-      if (token && disableRedirect == "true" && user?.teams?.length === 0) {
+      if (token) {
+        setToken(token);
+        dispatch(getUserProfile()).unwrap();
+      }
+      if (userData && userData?.teams?.length === 0) {
         try {
           await dispatch(getAllDepartments()).unwrap();
           setSelectedDepart("");
         } catch (error) {
-          console.error("Failed to fetch departments:", error);
           toast.error("Failed to load departments");
         }
-      }else{
-        // Microsoft Login success handler
       }
-
-      console.log("Response from fetchMicrosoftLoginSuccess:");
     };
     handleAuthCallback();
   }, [dispatch, navigate]);
-  console.log("departments from store ", departments);
-
+  useEffect(() => {
+    if (userData && userData.teams && userData.teams.length > 0) {
+      return window.location.reload();
+    }
+  }, [userData, navigate]);
   const handleContinue = async () => {
-    if (!user) return;
+    if (!userData) return;
     setLoading(true);
     try {
       // Send update to backend with team and role
       const response = await dispatch(
         updateUserByMemId({
-          memId: user.id,
+          memId: userData.id,
           data: {
             department_id: selectedDepart,
             hasCompletedProfile: true,
@@ -104,16 +125,13 @@ const AuthCallback: React.FC = () => {
     navigate("/");
   };
 
-  // Update the teams map in the render section to use fetched departments
-  // Replace the hardcoded teams array with:
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-africa-terracotta text-white mb-4">
-              <span className="font-bold text-xl">LV</span>
+              <span className="font-bold text-xl">IST</span>
             </div>
           </div>
           <h1 className="text-3xl font-semibold text-africa-dark">
@@ -141,10 +159,10 @@ const AuthCallback: React.FC = () => {
             </div>
 
             <h2 className="text-xl font-medium text-center">
-              Welcome, {user?.firstName} {user?.lastName}
+              Welcome, {userData?.firstName} {userData?.lastName}
             </h2>
             <p className="text-center text-muted-foreground text-sm">
-              Your email: {user?.email}
+              Your email: {userData?.email}
             </p>
           </CardHeader>
 
@@ -156,7 +174,7 @@ const AuthCallback: React.FC = () => {
                   <SelectValue placeholder="Select your department" />
                 </SelectTrigger>
                 <SelectContent>
-                  {departments.map((depart) => (
+                  {departments?.map((depart) => (
                     <SelectItem key={depart.id} value={depart.id}>
                       {depart.name}
                     </SelectItem>

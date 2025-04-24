@@ -72,7 +72,7 @@ export const updateUserRole = createAsyncThunk(
     async (data: UserRoleUpdateDTO, { rejectWithValue }) => {
         try {
             const response = await HttpRequest.put<User>(
-                `${BASE_URL}/api/users/${data.userId}`,
+                `${BASE_URL}/api/auth/user/${data.userId}`,
                 { role: data.role }
             );
             return response;
@@ -85,7 +85,11 @@ export const updateUserRole = createAsyncThunk(
 const userSlice = createSlice({
     name: 'users',
     initialState,
-    reducers: {},
+    reducers: {
+        setUserFromEncodedData: (state, action) => {
+            state.user = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getUserProfile.pending, (state) => {
@@ -113,7 +117,6 @@ const userSlice = createSlice({
             })
             .addCase(getAllUsers.fulfilled, (state, action) => {
                 state.isLoading = false;
-                console.log(action.payload, "======>/<")
                 state.users = action.payload;
             })
             .addCase(getAllUsers.rejected, (state, action) => {
@@ -128,5 +131,5 @@ const userSlice = createSlice({
             });
     },
 });
-
+export const { setUserFromEncodedData } = userSlice.actions
 export default userSlice.reducer;

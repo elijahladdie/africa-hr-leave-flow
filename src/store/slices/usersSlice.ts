@@ -129,10 +129,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.users = action.payload.data;
-        // state.totalUsers = action.payload.totalUsers;
-        // state.totalPages = action.payload.totalPages;
-        // state.currentPage = action.payload.currentPage;
+        state.users = action.payload;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.isLoading = false;
