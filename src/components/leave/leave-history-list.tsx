@@ -47,7 +47,7 @@ export function LeaveHistoryList({ leaveRequests }: LeaveHistoryListProps) {
   };
 
   const filteredRequests = useMemo(() => {
-    return leaveRequests.filter((request) => {
+    return leaveRequests?.filter((request) => {
       const matchesStatus = statusFilter === "all" || request.status === statusFilter;
       const matchesType = typeFilter === "all" || request.leaveType === typeFilter;
       return matchesStatus && matchesType;

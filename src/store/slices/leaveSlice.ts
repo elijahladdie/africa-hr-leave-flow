@@ -72,6 +72,47 @@ export const getTeamActiveRequests = createAsyncThunk(
     }
   }
 );
+export const createLeaveType = createAsyncThunk(
+  'leave/createType',
+  async (data: LeaveTypeFormValues, { rejectWithValue }) => {
+    try {
+      const response = await HttpRequest.post<ResponseData>(
+        `${BASE_URL}/api/leave-requests/types`,
+        data
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+export const updateLeaveType = createAsyncThunk(
+  'leave/updateType',
+  async ({ id, ...data }: LeaveTypeFormValues & { id: string }, { rejectWithValue }) => {
+    try {
+      const response = await HttpRequest.put<ResponseData>(
+        `${BASE_URL}/api/leave-requests/types/${id}`,
+        data
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+export const deleteLeaveType = createAsyncThunk(
+  'leave/deleteType',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await HttpRequest.delete(`${BASE_URL}/api/leave-requests/types/${id}`);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const initialState: LeaveState = {
   leaves: [],
@@ -123,12 +164,25 @@ const leaveSlice = createSlice({
       })
       .addCase(getTeamActiveRequests.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.activeRequest = action.payload.data;
+        state.activeRequest = action.payload;
       })
       .addCase(getTeamActiveRequests.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-      });
+      })
+      .addCase(createLeaveType.fulfilled, (state, action) => {
+        state.leaveTypes.push(action.payload.data);
+      })
+      .addCase(updateLeaveType.fulfilled, (state, action) => {
+        const index = state.leaveTypes.findIndex(type => type.id === action.payload.data.id);
+        if (index !== -1) {
+          state.leaveTypes[index] = action.payload.data;
+        }
+      })
+      .addCase(deleteLeaveType.fulfilled, (state, action) => {
+        state.leaveTypes = state.leaveTypes.filter(type => type.id !== action.payload);
+      })
+      ;
   }
 });
 

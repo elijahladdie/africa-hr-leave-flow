@@ -34,11 +34,10 @@ export default function Team() {
   useEffect(() => {
     const fetchTeamData = async () => {
       try {
-        const params = { page: 1, limit: 30 };
         await dispatch(getAllTeamMembers()).unwrap();
         await dispatch(getAllDepartments()).unwrap();
         await dispatch(getAllTeams()).unwrap();
-        await dispatch(fetchUsers(params)).unwrap();
+        await dispatch(fetchUsers()).unwrap();
       } catch (err) {
         toast.error(err.resp_msg || "Failed to load team members");
       } 
@@ -51,7 +50,6 @@ export default function Team() {
       // Reset any subscriptions or pending state
     };
   }, [dispatch]);
-
   // Function to get avatar initials
   const getInitials = (name: string) => {
     if (!name) return "N/A";
@@ -62,11 +60,8 @@ export default function Team() {
       .toUpperCase();
   };
 
-  const onSubmit = async (memberData: TeamMemberDTO) => {};
-
   // Handle creating a team
   const handleCreateTeam = async (data: TeamDTO) => {
-    console.log(data, ">>>>>>><<<<<<");
     dispatch(createTeam(data));
     // Also create team members
   
@@ -85,13 +80,10 @@ export default function Team() {
       ).unwrap();
       toast.success("Team member added successfully");
     } catch (err) {
-      console.log(err,  "======")
       toast.error(err.resp_msg || "Failed to add team member");
     } 
 
   };
-  console.log("Team members:", teamMembers);
-
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-8 bg-background">
       <div className="max-w-6xl mx-auto">

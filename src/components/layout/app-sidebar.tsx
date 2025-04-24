@@ -79,7 +79,7 @@ export function AppSidebar() {
   const { isCollapsed, setIsCollapsed } = useSidebar();
   const isMobile = useIsMobile();
 
-  const filteredMenuItems = menuItems.filter((item) =>
+  const filteredMenuItems = menuItems?.filter((item) =>
     user?.role ? item.roles.includes(user.role) : false
   );
 
@@ -111,16 +111,15 @@ export function AppSidebar() {
       </div>
     );
   }
-  console.log(user, "user in app sidebar");
   return (
     <Sidebar className="transition-all duration-300">
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <span className="font-semibold text-lg text-white">LV</span>
+            <span className="font-semibold text-lg text-white">IST</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-medium text-sm">LV Africa</span>
+            <span className="font-medium text-sm">IST Africa</span>
             <span className="text-xs text-muted-foreground">
               Leave Management
             </span>
@@ -211,7 +210,7 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <div className="mt-6 text-xs text-muted-foreground text-center">
-            <p>LV Africa Leave System</p>
+            <p>IST Africa Leave System</p>
             <p>v1.0.0</p>
           </div>
         </div>

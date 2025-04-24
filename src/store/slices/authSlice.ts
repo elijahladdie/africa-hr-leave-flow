@@ -43,7 +43,6 @@ export const loginInternal = createAsyncThunk<
       `${BASE_URL}/api/auth/login?loginType=INTERNAL`,
       { email, password }
     );
-    console.log("re")
     return response;
   } catch (err: any) {
     return rejectWithValue(err.message || 'Login failed');
@@ -222,23 +221,8 @@ const authSlice = createSlice({
         state.error = action.payload || 'Login failed';
       });
 
-    // fetchMicrosoftLoginSuccess
-    builder
-      .addCase(fetchMicrosoftLoginSuccess.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchMicrosoftLoginSuccess.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.data.user;
-        state.token = action.payload.data.token;
-        state.newUser = action.payload.data.newUser;
-      })
-      .addCase(fetchMicrosoftLoginSuccess.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || 'Microsoft login failed';
-      });
+
+ 
 
     // getMicrosoftUserInfo
     builder

@@ -84,7 +84,7 @@ const AddTeamMemberForm = ({ teams, availableUsers, onAddMember }) => {
               </SelectTrigger>
               <SelectContent>
                 {availableUsers
-                  .filter((user) => user.role === "STAFF")
+                  ?.filter((user) => user.role === "STAFF")
                   .map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.fullName}

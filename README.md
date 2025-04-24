@@ -132,4 +132,4 @@ Current Version: v1.0.0
 
 ### License
 
-Copyright © 2024 Your Organization
+Copyright © 2025 IST AFRICA

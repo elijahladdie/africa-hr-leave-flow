@@ -133,14 +133,13 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
   const getLeaveEvents = (date: Date) => {
     const targetDate = date.toISOString().split("T")[0];
 
-    return events.filter((leave) => {
+    return events?.filter((leave) => {
       const start = leave.startDate.split("T")[0];
       const end = leave.endDate.split("T")[0];
       return targetDate >= start && targetDate <= end;
     });
   };
   const handleDayClick = (day) => {
-    console.log("=====> ", day);
     if (day.startDate && day.endDate) {
       setSelectedDay(day);
       setIsDialogOpen(true);

@@ -34,7 +34,6 @@ export default function AdminSettings() {
           dispatch(getAllDepartments()).unwrap(),
           dispatch(getAllUsers()).unwrap(),
         ]);
-        console.log("Initial data loaded:", { departments, users });
       } catch (error) {
         toast.error("Failed to load initial data");
         console.error("Error loading initial data:", error);
@@ -45,7 +44,6 @@ export default function AdminSettings() {
 
     fetchInitialData();
   }, [dispatch]);
-console.log(users, "><><<><><><><")
   const handleDepartmentUpdate = async (departmentData: DepartmentDTO) => {
     setIsSaving(true);
     try {
@@ -55,7 +53,6 @@ console.log(users, "><><<><><><><")
           data: departmentData,
         })
       ).unwrap();
-      console.log("Department updated:", response);
       toast.success("Department settings updated successfully");
     } catch (err) {
       toast.error("Failed to update department settings");
@@ -72,7 +69,6 @@ console.log(users, "><><<><><><><")
     try {
       const data: UserRoleUpdateDTO = { userId, role };
       const response = await dispatch(updateUserRole(data)).unwrap();
-      console.log("User role updated:", response);
       toast.success("User role updated successfully");
     } catch (err) {
       toast.error("Failed to update user role");

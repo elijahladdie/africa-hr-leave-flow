@@ -32,7 +32,7 @@ export const markNotificationAsRead = createAsyncThunk(
             const response = await HttpRequest.put<ResponseData>(
                 `${BASE_URL}/api/notifications/${id}/read`
             );
-            return response;
+            return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data);
         }
@@ -68,10 +68,9 @@ const notificationSlice = createSlice({
                 state.error = action.payload as string;
             })
             .addCase(markNotificationAsRead.fulfilled, (state, action) => {
-                console.log("Notification marked as read:", action.payload.data);
-                const index = state.notifications.findIndex(n => n.id === action.payload.data.id);
+                const index = state.notifications.findIndex(n => n.id === action.payload.id);
                 if (index !== -1) {
-                    state.notifications[index] = action.payload.data;
+                    state.notifications[index] = action.payload;
                 }
             });
     },

@@ -78,7 +78,6 @@ export default function ApprovalDashboard() {
           comment,
         })
       ).unwrap();
-      console.log("Leave request updated:", response);
       toast.success(`Leave request ${status.toLowerCase()} successfully`);
     } catch (err) {
       toast.error("Failed to update leave request");

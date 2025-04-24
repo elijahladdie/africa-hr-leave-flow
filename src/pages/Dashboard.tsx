@@ -8,34 +8,47 @@ import { RootState, useAppDispatch, useAppSelector } from "@/store";
 import { useAuth } from "@/contexts/auth-context";
 import { getTeamActiveRequests } from "@/store/slices/leaveSlice";
 import { fetchLeaveHistory } from "@/store/slices/leaveHistorySlice";
+import { useLocation } from "react-router-dom";
 
 export default function Dashboard() {
   // Sample leave balance data with more realistic values
 
-  // Sample team leave data with African holidays and events
-
   const { user: calledfromAuth } = useAuth();
   const dispatch = useAppDispatch();
-    const { requests } = useAppSelector((state) => state.leaveHistory);
-  
+  const { requests } = useAppSelector((state) => state.leaveHistory);
+
   const { user } = useAppSelector((state) => state.user);
   const [leaveBalances, setLeaveBalances] = useState([]);
+  const location = useLocation();
+  const [hasReloaded, setHasReloaded] = useState(false);
+
+  useEffect(() => {
+    const previousPath = location.state?.from?.pathname || "/";
+    if (
+      !hasReloaded &&
+      (previousPath.includes("/callback") || previousPath.includes("/login"))
+    ) {
+      setHasReloaded(true);
+      window.location.reload();
+    }
+  }, []);
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         await dispatch(getUserProfile()).unwrap();
         await dispatch(fetchLeaveHistory()).unwrap();
         if (calledfromAuth?.teams && calledfromAuth?.teams?.length !== 0) {
-          console.log(calledfromAuth?.teams?.[0]?.id, "team id");
-          dispatch(getTeamActiveRequests(calledfromAuth?.teams?.[0]?.id)).unwrap();
+          dispatch(
+            getTeamActiveRequests(calledfromAuth?.teams?.[0]?.id)
+          ).unwrap();
         }
       } catch (err) {
         toast.error(
-          err.response.data.resp_msg || "FaiLed to load user profile"
+          err.response?.data?.resp_msg || "FaiLed to load user profile"
         );
       }
     };
-  
+
     if (user?.leaveBalances?.length !== 0) {
       setLeaveBalances(user?.leaveBalances);
     }

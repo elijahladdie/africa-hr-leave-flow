@@ -142,7 +142,6 @@ export default function NotificationPopup() {
 
 
   const markAsRead = async (id: string) => {
-    console.log(id);
     await dispatch(markNotificationAsRead(id)).unwrap();
   };
 
