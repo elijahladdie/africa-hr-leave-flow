@@ -44,8 +44,8 @@ All Manager permissions, plus:
 
 2. **Logging In**
    ```
-   URL: https://your-domain.com/login
-   Required: Email and password
+   URL: http://localhost:300/login
+   Required: Microsoft account or predefined Email and password
    ```
 
 3. **Navigation**
@@ -88,12 +88,6 @@ All Manager permissions, plus:
   - Tablets
   - Mobile phones
 
-### Support
-
-For technical support:
-- Email: support@your-domain.com
-- Help Center: https://help.your-domain.com
-- Contact your system administrator
 
 ### Security
 
