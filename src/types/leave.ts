@@ -16,6 +16,9 @@ export interface LeaveRequest {
   duration: string;
   status: 'APPROVED' | 'REJECTED' | 'PENDING';
   reason: string;
+  profilePictureUrl?: string;
+  userName?: string;
+  leaveType?: string;
 }
 
 export interface LeaveHistoryState {
@@ -31,7 +34,7 @@ export interface LeaveRequestDTO {
   halfDay: boolean;
   reason: string;
   submittedAt: string;
-} 
+}
 export interface LeaveType {
   id: string;
   name: string;
