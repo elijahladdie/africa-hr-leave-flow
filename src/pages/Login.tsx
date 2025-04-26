@@ -38,7 +38,7 @@ const Login = () => {
           "/auth/callback?token=" + resp.data.token + "&disableRedirect=true "
         );
       } else {
-        navigate("/");
+        window.location.reload();
       }
     } catch (err: any) {
       toast.error(err?.response?.data.resp_msg || "Invalid credentials", {

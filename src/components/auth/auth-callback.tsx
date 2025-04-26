@@ -69,7 +69,7 @@ const AuthCallback: React.FC = () => {
     }
   }, [encodedData]);
   const isFormValid = selectedDepart !== "";
-
+console.log(userData)
   useEffect(() => {
     const handleAuthCallback = async () => {
       if (token) {

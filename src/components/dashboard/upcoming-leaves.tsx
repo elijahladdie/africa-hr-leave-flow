@@ -99,7 +99,7 @@ export function UpcomingLeaves({ leaves }: UpcomingLeavesProps) {
                           {formatDateRange(leave.startDate, leave.endDate)}
                         </p>
                         <p
-                          className={`text-xs text-muted-foreground mt-0.5 
+                          className={`text-xs text-muted-foreground mt-0.5 w-fit px-2 py-0.5 rounded-full
                           ${
                             leave.status === "APPROVED"
                               ? "bg-green-100 text-green-700"
