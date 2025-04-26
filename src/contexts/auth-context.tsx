@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     // Show success message
     toast.success("Login successful!", {
-      description: "Welcome to IST Africa Leave Management System",
+      description: "Welcome to SP Africa Leave Management System",
     });
 
     return true;

@@ -126,4 +126,4 @@ Current Version: v1.0.0
 
 ### License
 
-Copyright © 2025 IST AFRICA
+Copyright © 2025 SP AFRICA

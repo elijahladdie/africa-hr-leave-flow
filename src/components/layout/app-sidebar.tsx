@@ -116,10 +116,10 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <span className="font-semibold text-lg text-white">IST</span>
+            <span className="font-semibold text-lg text-white">SP</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-medium text-sm">IST Africa</span>
+            <span className="font-medium text-sm">SP Africa</span>
             <span className="text-xs text-muted-foreground">
               Leave Management
             </span>
@@ -210,7 +210,7 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <div className="mt-6 text-xs text-muted-foreground text-center">
-            <p>IST Africa Leave System</p>
+            <p>SP Africa Leave System</p>
             <p>v1.0.0</p>
           </div>
         </div>
