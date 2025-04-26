@@ -62,8 +62,7 @@ const AuthCallback: React.FC = () => {
         setUserData(user);
       }
       if (errorData) {
-        toast.error(
-          "Oops! We had problem validating you identification please try again"
+        toast.error( errorData || "Oops! We had problem validating your identification please try again"
         );
         navigate("/login");
       }
