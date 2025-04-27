@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Info } from 'lucide-react';
 
 interface LeaveBalanceCardProps {
-  leaveType: string;
+   leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   usedDays: number;
   totalDays: number;
   accrued?: number;

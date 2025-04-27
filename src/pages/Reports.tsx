@@ -28,7 +28,7 @@ import { useAppDispatch, useAppSelector, type RootState } from "@/store";
 
 import { DateRange } from "@/types/reports";
 import { fetchLeaveHistory } from "@/store/slices/leaveHistorySlice";
-import { getLeaveTypes } from "@/store/slices/leaveSlice";
+import { getAllLeavebalance, getLeaveTypes } from "@/store/slices/leaveSlice";
 import { getUserProfile } from "@/store/slices/userSlice";
 import {
   Table,
@@ -45,7 +45,7 @@ const COLORS = ["#E57373", "#64B5F6", "#81C784", "#FFD54F", "#9575CD"];
 export default function Reports() {
   const dispatch = useAppDispatch();
   const { requests } = useAppSelector((state) => state.leaveHistory);
-  const { leaveTypes } = useAppSelector((state) => state.leave);
+  const { leaveTypes, LeaveBalance } = useAppSelector((state) => state.leave);
   const { user } = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
@@ -61,6 +61,7 @@ export default function Reports() {
           dispatch(fetchLeaveHistory()).unwrap(),
           dispatch(getLeaveTypes()).unwrap(),
           dispatch(getUserProfile()).unwrap(),
+          dispatch(getAllLeavebalance()).unwrap(),
         ]);
       } catch (err) {
         toast.error("Failed to load report data");
@@ -121,7 +122,7 @@ export default function Reports() {
       id: "balance-report",
       title: "Leave Balance Report",
       description: "Current leave balances for all leave types",
-      data: user?.leaveBalances || [],
+      data: LeaveBalance || [],
       lastUpdated: new Date().toLocaleString(),
     },
   ];
@@ -296,6 +297,7 @@ export default function Reports() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Names</TableHead>
                       <TableHead>Leave Type</TableHead>
                       <TableHead>Allocated</TableHead>
                       <TableHead>Used</TableHead>
@@ -303,8 +305,11 @@ export default function Reports() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {user?.leaveBalances?.map((bal, idx) => (
+                    {LeaveBalance?.map((bal, idx) => (
                       <TableRow key={idx}>
+                        <TableCell className="font-medium">
+                          {bal.userName}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {bal.leaveType}
                         </TableCell>
@@ -334,6 +339,7 @@ export default function Reports() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Names</TableHead>
                       <TableHead>Leave Type</TableHead>
                       <TableHead>Reason</TableHead>
                       <TableHead className="hidden md:table-cell">
@@ -347,6 +353,9 @@ export default function Reports() {
                   <TableBody>
                     {requests.map((req) => (
                       <TableRow key={req.id}>
+                        <TableCell className="font-medium">
+                          {req.userName}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {req.leaveType}
                         </TableCell>

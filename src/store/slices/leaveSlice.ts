@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { LeaveRequest, LeaveApplicationDTO, LeaveRequestDTO, LeaveType } from '@/types/leave';
 import HttpRequest from '@/lib/HttpRequest';
@@ -8,6 +9,7 @@ const BASE_URL = import.meta.env.VITE_APP_BASE_URL_LOCAL;
 interface LeaveState {
   leaves: LeaveRequest[];
   leaveTypes: LeaveType[];
+  LeaveBalance: any[];
   activeRequest: LeaveRequest[];
   currentLeave: LeaveRequest | null;
   isLoading: boolean;
@@ -53,7 +55,7 @@ export const getLeaveTypes = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/leave-requests/types`);
-      return response;
+      return response.data;
     } catch (error) {
       console.error('Failed to fetch leave types:', error);
       return rejectWithValue(error.message);
@@ -72,9 +74,21 @@ export const getTeamActiveRequests = createAsyncThunk(
     }
   }
 );
+export const getAllLeavebalance = createAsyncThunk(
+  'LeaveTypes/getAllLeavebalance',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await HttpRequest.get<ResponseData>(`${BASE_URL}/api/leave-balances/all`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch leave types:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const createLeaveType = createAsyncThunk(
   'leave/createType',
-  async (data: LeaveTypeFormValues, { rejectWithValue }) => {
+  async (data: any, { rejectWithValue }) => {
     try {
       const response = await HttpRequest.post<ResponseData>(
         `${BASE_URL}/api/leave-requests/types`,
@@ -89,7 +103,7 @@ export const createLeaveType = createAsyncThunk(
 
 export const updateLeaveType = createAsyncThunk(
   'leave/updateType',
-  async ({ id, ...data }: LeaveTypeFormValues & { id: string }, { rejectWithValue }) => {
+  async ({ id, ...data }: any & { id: string }, { rejectWithValue }) => {
     try {
       const response = await HttpRequest.put<ResponseData>(
         `${BASE_URL}/api/leave-requests/types/${id}`,
@@ -118,6 +132,7 @@ const initialState: LeaveState = {
   leaves: [],
   leaveTypes: [],
   activeRequest: [],
+  LeaveBalance: [],
   currentLeave: null,
   isLoading: false,
   error: null,
@@ -152,9 +167,21 @@ const leaveSlice = createSlice({
       })
       .addCase(getLeaveTypes.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.leaveTypes = action.payload.data;
+        state.leaveTypes = action.payload;
       })
       .addCase(getLeaveTypes.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getAllLeavebalance.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getAllLeavebalance.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.LeaveBalance = action.payload;
+      })
+      .addCase(getAllLeavebalance.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })

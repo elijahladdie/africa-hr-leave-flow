@@ -43,7 +43,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store";
 
-const requiresDocumentation = (leaveType: string): boolean => {
+const requiresDocumentation = ( leaveType: string): boolean => {
   return ["SICK", "OTHER"].includes(leaveType);
 };
 

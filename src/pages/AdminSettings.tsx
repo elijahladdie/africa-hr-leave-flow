@@ -14,11 +14,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Sliders, Users, Database, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function AdminSettings() {
   const dispatch = useAppDispatch();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Get data from Redux store
   const departments = useAppSelector(
@@ -44,23 +52,29 @@ export default function AdminSettings() {
 
     fetchInitialData();
   }, [dispatch]);
-  const handleDepartmentUpdate = async (departmentData: DepartmentDTO) => {
-    setIsSaving(true);
+  const handleDepartmentUpdate = (department) => {
+    setSelectedDepartment(department);
+    setIsEditDialogOpen(true);
+  };
+  const saveDepartmentChanges = async () => {
+    if (!selectedDepartment) return;
+
     try {
-      const response = await dispatch(
+      setIsSaving(true);
+      await dispatch(
         updateDepartment({
-          id: departmentData.id,
-          data: departmentData,
+          id: selectedDepartment.id,
+          data: selectedDepartment,
         })
       ).unwrap();
-      toast.success("Department settings updated successfully");
-    } catch (err) {
-      toast.error("Failed to update department settings");
-      console.error("Department update error:", err);
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to update department:", error);
     } finally {
       setIsSaving(false);
     }
   };
+
 
   const handleUserRoleUpdate = async (
     userId: string,
@@ -152,6 +166,59 @@ export default function AdminSettings() {
             ))}
           </div>
         )}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Department</DialogTitle>
+            </DialogHeader>
+            {selectedDepartment && (
+              <div className="space-y-4 py-4">
+                <div>
+                  <label className="text-sm font-medium">Department Name</label>
+                  <input
+                    type="text"
+                    value={selectedDepartment.name}
+                    onChange={(e) =>
+                      setSelectedDepartment({
+                        ...selectedDepartment,
+                        name: e.target.value,
+                      })
+                    }
+                    className="w-full border p-2 rounded mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Description</label>
+                  <textarea
+                    value={selectedDepartment.description}
+                    onChange={(e) =>
+                      setSelectedDepartment({
+                        ...selectedDepartment,
+                        description: e.target.value,
+                      })
+                    }
+                    className="w-full border p-2 rounded mt-1"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => saveDepartmentChanges()}
+                    disabled={isSaving}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

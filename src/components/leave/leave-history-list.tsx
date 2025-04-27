@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface LeaveRequest {
   id: string;
-  leaveType: string;
+   leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   startDate: string;
   endDate: string;
   duration: string;

@@ -65,7 +65,7 @@ export const updateDepartment = createAsyncThunk(
     async ({ id, data }: { id: string; data: DepartmentDTO }, { rejectWithValue }) => {
         try {
             const response = await HttpRequest.put<ResponseData>(`${BASE_URL}/api/departments/${id}`, data);
-            return response;
+            return response.data;
         } catch (error) {
             return rejectWithValue(error.response);
         }
@@ -101,6 +101,72 @@ const departmentSlice = createSlice({
             .addCase(getAllDepartments.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
+            })
+
+            // Get Department By ID
+            .addCase(getDepartmentById.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getDepartmentById.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.currentDepartment = action.payload.data;
+            })
+            .addCase(getDepartmentById.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+
+            // Create Department
+            .addCase(createDepartment.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(createDepartment.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.departments.push(action.payload.data);
+                toast.success("Department created successfully!");
+            })
+            .addCase(createDepartment.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+                toast.error("Failed to create department.");
+            })
+
+            // Update Department
+            .addCase(updateDepartment.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateDepartment.fulfilled, (state, action) => {
+                state.isLoading = false;
+                const updated = action.payload;
+                state.departments = state.departments.map((dept) =>
+                    dept.id === updated.id ? updated : dept
+                );
+                toast.success("Department updated successfully!");
+            })
+            .addCase(updateDepartment.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+                toast.error("Failed to update department.");
+            })
+
+            // Delete Department
+            .addCase(deleteDepartment.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(deleteDepartment.fulfilled, (state, action) => {
+                state.isLoading = false;
+                const deletedId = action.meta.arg; // id passed into thunk
+                state.departments = state.departments.filter((dept) => dept.id !== deletedId);
+                toast.success("Department deleted successfully!");
+            })
+            .addCase(deleteDepartment.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+                toast.error("Failed to delete department.");
             })
         // Add other cases for remaining actions
     },

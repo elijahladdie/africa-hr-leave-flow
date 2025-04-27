@@ -2,7 +2,7 @@ export interface LeaveApproval {
   id: string;
   userName: string;
   avatar?: string;
-  leaveType: string;
+   leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   startDate: string;
   endDate: string;
   duration: string;

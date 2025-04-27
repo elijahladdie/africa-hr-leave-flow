@@ -131,7 +131,7 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
   // Get leave events for a specific date
 
   const getLeaveEvents = (date: Date) => {
-    const targetDate = date.toISOString().split("T")[0];
+    const targetDate = format(date, "yyyy-MM-dd");
 
     return events?.filter((leave) => {
       const start = leave.startDate.split("T")[0];
@@ -220,6 +220,7 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
             }
 
             // Get leave events for this day
+            console.log(" ====== || ==== ", day);
             const events = day.date ? getLeaveEvents(day.date) : [];
 
             return (
@@ -287,7 +288,6 @@ export function TeamCalendar({ className }: TeamCalendarProps) {
                   {selectedDay?.startDate &&
                     format(selectedDay.startDate, "EEEE, MMMM d, yyyy")}
                 </DialogTitle>
-             
               </div>
             </DialogHeader>
             <div className="py-4">

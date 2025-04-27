@@ -1,5 +1,5 @@
 export interface LeaveApplicationDTO {
-  leaveType: string;
+  leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   startDate: string;
   endDate: string;
   halfDay: boolean;
@@ -28,7 +28,7 @@ export interface LeaveHistoryState {
 }
 
 export interface LeaveRequestDTO {
-  leaveType: string;
+  leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   startDate: string;
   endDate: string;
   halfDay: boolean;
@@ -38,8 +38,11 @@ export interface LeaveRequestDTO {
 export interface LeaveType {
   id: string;
   name: string;
-  leaveType: string;
+  leaveType: "ANNUAL" | "SICK" | "MATERNITY" | "PATERNITY" | "UNPAID" | "OTHER";
   description: string;
+  defaultDays: number;
+  requiresApproval: boolean;
+  isPaid: boolean;
   maxDays: number;
   createdAt: string;
   updatedAt: string;

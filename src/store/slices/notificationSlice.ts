@@ -22,7 +22,7 @@ export const getUserNotifications = createAsyncThunk(
 );
 
 // Mark notification as read
-export const markNotificationAsRead = createAsyncThunk(
+export const    markNotificationAsRead = createAsyncThunk(
     'notifications/markAsRead',
     async (id: string, { rejectWithValue }) => {
         try {
