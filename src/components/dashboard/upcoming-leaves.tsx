@@ -10,14 +10,7 @@ import {
   isBefore,
   isAfter,
 } from "date-fns";
-// interface TeamMemberLeave {
-//   id: string;
-//   name: string;
-//   avatar?: string;
-//   startDate: string;
-//   endDate: string;
-//   leaveType: string;
-// }
+
 
 interface UpcomingLeavesProps {
   leaves: LeaveRequest[];

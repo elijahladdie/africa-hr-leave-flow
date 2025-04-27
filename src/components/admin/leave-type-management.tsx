@@ -1,3 +1,11 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+// import { Edit, PlusCircle, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -49,11 +57,21 @@ import { Skeleton } from "../ui/skeleton";
 // Form schema for leave type form
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
-  allowance: z.number().min(0, { message: "Allowance must be non-negative" }),
+  defaultDays: z
+    .number()
+    .min(0, { message: "defaultDays must be non-negative" }),
   description: z.string().optional(),
   requiresApproval: z.boolean().default(true),
   isPaid: z.boolean().default(false),
   active: z.boolean().default(true),
+  leaveType: z.enum([
+    "ANNUAL",
+    "SICK",
+    "MATERNITY",
+    "PATERNITY",
+    "UNPAID",
+    "OTHER",
+  ]),
 });
 
 type LeaveTypeFormValues = z.infer<typeof formSchema>;
@@ -89,7 +107,7 @@ export function LeaveTypeManagement() {
         ).unwrap();
         toast.success("Leave type updated successfully");
       } else {
-        await dispatch(createLeaveType(data)).unwrap();
+        // await dispatch(createLeaveType(data)).unwrap();
         toast.success("Leave type created successfully");
       }
       setIsDialogOpen(false);
@@ -106,7 +124,14 @@ export function LeaveTypeManagement() {
     const leaveType = leaveTypes.find((type) => type.id === id);
     if (leaveType) {
       setEditingId(id);
-      form.reset(leaveType);
+      form.reset({
+        name: leaveType.name,
+        defaultDays: leaveType.defaultDays,
+        description: leaveType.description || "",
+        requiresApproval: leaveType.requiresApproval,
+        isPaid: leaveType.isPaid,
+        leaveType: leaveType.leaveType,
+      });
       setIsDialogOpen(true);
     }
   };
@@ -128,67 +153,14 @@ export function LeaveTypeManagement() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      allowance: 0,
+      defaultDays: 0,
       description: "",
       requiresApproval: true,
       isPaid: false,
       active: true,
+      leaveType: "ANNUAL",
     },
   });
-
-  // Handle form submission
-  // function onSubmit(data: LeaveTypeFormValues) {
-  //   if (editingId) {
-  //     setLeaveTypes(
-  //       leaveTypes.map((type) =>
-  //         type.id === editingId
-  //           ? {
-  //               ...type,
-  //               name: data.name,
-  //               allowance: data.allowance,
-  //               description: data.description || "",
-  //               requiresApproval: data.requiresApproval,
-  //               isPaid: data.isPaid,
-  //               active: data.active,
-  //             }
-  //           : type
-  //       )
-  //     );
-  //   } else {
-  //     setLeaveTypes([
-  //       ...leaveTypes,
-  //       {
-  //         id: Date.now().toString(),
-  //         name: data.name,
-  //         allowance: data.allowance,
-  //         description: data.description || "",
-  //         requiresApproval: data.requiresApproval,
-  //         isPaid: data.isPaid,
-  //         active: data.active,
-  //       },
-  //     ]);
-  //   }
-  //   setIsDialogOpen(false);
-  //   setEditingId(null);
-  //   form.reset();
-  // }
-
-  // Handle edit click
-  // const handleEdit = (id: string) => {
-  //   const leaveType = leaveTypes.find((type) => type.id === id);
-  //   if (leaveType) {
-  //     setEditingId(id);
-  //     form.reset(leaveType);
-  //     setIsDialogOpen(true);
-  //   }
-  // };
-
-  // // Handle delete click
-  // const handleDelete = (id: string) => {
-  //   if (confirm("Are you sure you want to delete this leave type?")) {
-  //     setLeaveTypes(leaveTypes.filter((type) => type.id !== id));
-  //   }
-  // };
 
   // Handle dialog close
   const handleDialogClose = () => {
@@ -202,17 +174,10 @@ export function LeaveTypeManagement() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-medium">Leave Types</CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="default"
-                size="sm"
-                className="bg-africa-terracotta hover:bg-africa-terracotta/90"
-              >
-                <PlusCircle className="h-4 w-4 mr-1" />
-                Add Leave Type
-              </Button>
-            </DialogTrigger>
+          <Dialog
+            open={isDialogOpen && editingId !== null}
+            onOpenChange={setIsDialogOpen}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
@@ -245,12 +210,48 @@ export function LeaveTypeManagement() {
                       </FormItem>
                     )}
                   />
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="leaveType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Leave Type</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a leave type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Array.from(
+                                new Set(
+                                  leaveTypes.map((type) => type.leaveType)
+                                )
+                              ).map((leaveType) => (
+                                <SelectItem key={leaveType} value={leaveType}>
+                                  {leaveType}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Select the type of leave
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
                     control={form.control}
-                    name="allowance"
+                    name="defaultDays"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Allowance (days)</FormLabel>
+                        <FormLabel>defaultDays (days)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -319,7 +320,7 @@ export function LeaveTypeManagement() {
                       )}
                     />
                   </div>
-               
+
                   <DialogFooter className="pt-2">
                     <Button
                       type="button"
@@ -349,35 +350,63 @@ export function LeaveTypeManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Allowance</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Default Days</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Description
                   </TableHead>
-                  <TableHead className="whitespace-nowrap">Requires Approval</TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    Requires Approval
+                  </TableHead>
                   <TableHead>Is Paid</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leaveTypes.map((type) => (
-                  <TableRow key={type.id}>
-                    <TableCell className="font-medium">{type.name}</TableCell>
-                    <TableCell>{type.defaultDays} days</TableCell>
-                    <TableCell className="hidden md:table-cell max-w-xs truncate">
-                      {type.description}
-                    </TableCell>
-                    <TableCell>
-                      {type.requiresApproval ? "Required" : "Not Required"}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex h-2 w-2 rounded-full ${
-                          type.isPaid ? "bg-africa-sage" : "bg-gray-300"
-                        } mr-1`}
-                      ></span>
-                      {type.isPaid ? "Yes" : "No"}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {leaveTypes
+                  .slice() // important to avoid mutating original array
+                  .sort((a, b) => a.leaveType.localeCompare(b.leaveType))
+                  .map((type) => (
+                    <TableRow key={type.id}>
+                      <TableCell className="font-medium">
+                        {type.leaveType}
+                      </TableCell>
+                      <TableCell className="font-medium">{type.name}</TableCell>
+                      <TableCell>{type.defaultDays} days</TableCell>
+                      <TableCell className="hidden md:table-cell max-w-xs truncate">
+                        {type.description}
+                      </TableCell>
+                      <TableCell>
+                        {type.requiresApproval ? "Required" : "Not Required"}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex h-2 w-2 rounded-full ${
+                            type.isPaid ? "bg-africa-sage" : "bg-gray-300"
+                          } mr-1`}
+                        ></span>
+                        {type.isPaid ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(type.id)}
+                          className="inline-flex items-center justify-center"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(type.id)}
+                          className="inline-flex items-center justify-center text-destructive hover:text-destructive"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </div>

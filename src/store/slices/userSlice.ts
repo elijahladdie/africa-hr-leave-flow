@@ -71,11 +71,11 @@ export const updateUserRole = createAsyncThunk(
     'users/updateRole',
     async (data: UserRoleUpdateDTO, { rejectWithValue }) => {
         try {
-            const response = await HttpRequest.put<User>(
+            const response = await HttpRequest.put<ResponseData>(
                 `${BASE_URL}/api/auth/user/${data.userId}`,
                 { role: data.role }
             );
-            return response;
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(error.message);
         }

@@ -68,7 +68,7 @@ export function UserProfile({
               className="text-sm text-africa-blue hover:text-africa-blue/80 flex items-center transition-colors"
             >
               <UserCog className="h-3.5 w-3.5 mr-1" />
-              Manage profile
+              View profile info
             </Link>
           </div>
         </div>

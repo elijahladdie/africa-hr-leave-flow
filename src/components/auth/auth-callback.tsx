@@ -62,21 +62,23 @@ const AuthCallback: React.FC = () => {
         setUserData(user);
       }
       if (errorData) {
-        toast.error( errorData || "Oops! We had problem validating your identification please try again"
+        toast.error(
+          errorData ||
+            "Oops! We had problem validating your identification please try again"
         );
         navigate("/login");
       }
     }
   }, [encodedData]);
   const isFormValid = selectedDepart !== "";
-console.log(userData)
+  console.log(userData);
   useEffect(() => {
     const handleAuthCallback = async () => {
       if (token) {
         setToken(token);
         dispatch(getUserProfile()).unwrap();
       }
-      if (userData && userData?.teams?.length === 0) {
+      if (userData.role == "STAFF" || user.role == "MANAGER") {
         try {
           await dispatch(getAllDepartments()).unwrap();
           setSelectedDepart("");
